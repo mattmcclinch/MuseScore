@@ -334,23 +334,23 @@ SaveState::SaveState(Score* s)
    : undoInputState(s), redoInputState(s->inputState())
       {
       score = s;
-//      redoSelection  = score->selection();
+      redoSelection  = score->selection();
       }
 
 void SaveState::undo(EditData*)
       {
       redoInputState = score->inputState();
-//      redoSelection  = score->selection();
+      redoSelection  = score->selection();
       score->setInputState(undoInputState);
-//      score->setSelection(undoSelection);
+      score->setSelection(undoSelection);
       }
 
 void SaveState::redo(EditData*)
       {
       undoInputState = score->inputState();
-//      undoSelection  = score->selection();
+      undoSelection  = score->selection();
       score->setInputState(redoInputState);
-//      score->setSelection(redoSelection);
+      score->setSelection(redoSelection);
       }
 
 //---------------------------------------------------------

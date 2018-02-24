@@ -1644,6 +1644,8 @@ void MuseScore::selectionChanged(SelState selectionState)
             pianorollEditor->changeSelection(selectionState);
       if (drumrollEditor)
             drumrollEditor->changeSelection(selectionState);
+      if (_pianoTools && _pianoTools->isVisible())
+            _pianoTools->changeSelection(cs->selection());
       if (timeline())
             timeline()->changeSelection(selectionState);
       updateInspector();
