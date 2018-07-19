@@ -2266,18 +2266,23 @@ bool TextBase::setProperty(Pid propertyId, const QVariant& v)
                   break;
             case Pid::FONT_FACE:
                   setFamily(v.toString());
+                  layoutInvalid = true;
                   break;
             case Pid::FONT_SIZE:
                   setSize(v.toReal());
+                  layoutInvalid = true;
                   break;
             case Pid::FONT_BOLD:
                   setBold(v.toBool());
+                  layoutInvalid = true;
                   break;
             case Pid::FONT_ITALIC:
                   setItalic(v.toBool());
+                  layoutInvalid = true;
                   break;
             case Pid::FONT_UNDERLINE:
                   setUnderline(v.toBool());
+                  layoutInvalid = true;
                   break;
             case Pid::FRAME:
                   setHasFrame(v.toBool());
