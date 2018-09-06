@@ -66,6 +66,8 @@ void TextBase::startEdit(EditData& ed)
 void TextBase::endEdit(EditData& ed)
       {
       TextEditData* ted = static_cast<TextEditData*>(ed.getData(this));
+      if (!ted)
+            return;
       score()->undoStack()->remove(ted->startUndoIdx);           // remove all undo/redo records
 
       // replace all undo/redo records collected during text editing with
