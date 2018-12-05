@@ -770,6 +770,10 @@ void Segment::checkEmpty() const
 
 Fraction Segment::rfrac() const
       {
+      if (_segmentType == SegmentType::ChordRest)
+            for (Element* e : _elist)
+                  if (e)
+                        return e->rfrac();
       return Fraction::fromTicks(_tick);
       }
 
@@ -780,6 +784,10 @@ Fraction Segment::rfrac() const
 
 Fraction Segment::afrac() const
       {
+      if (_segmentType == SegmentType::ChordRest)
+            for (Element* e : _elist)
+                  if (e)
+                        return e->afrac();
       return Fraction::fromTicks(tick());
       }
 
