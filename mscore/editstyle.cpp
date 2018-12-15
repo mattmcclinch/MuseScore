@@ -580,6 +580,11 @@ EditStyle::EditStyle(Score* s, QWidget* parent)
             textStyles->addItem(item);
             }
 
+      textStyleFrameType->clear();
+      textStyleFrameType->addItem(tr("No frame"), int(FrameType::NO_FRAME));
+      textStyleFrameType->addItem(tr("Square"),   int(FrameType::SQUARE));
+      textStyleFrameType->addItem(tr("Circle"),   int(FrameType::CIRCLE));
+
       // font face
       resetTextStyleFontFace->setIcon(*icons[int(Icons::reset_ICON)]);
       connect(resetTextStyleFontFace, &QToolButton::clicked,
