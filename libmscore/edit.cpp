@@ -4601,7 +4601,6 @@ void Score::undoRemoveElement(Element* element)
                         undo(new RemoveElement(s));
                   }
             }
-      checkSpanner(element->tick(), element->tick());
       }
 
 //---------------------------------------------------------
