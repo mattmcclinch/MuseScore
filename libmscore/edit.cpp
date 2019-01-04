@@ -1586,11 +1586,10 @@ void Score::deleteItem(Element* el)
                                     Element* del = s->element(track);
                                     if (s->segmentType() != st || !del)
                                           continue;
-                                    if (toRest(del)->isGap()) {
+                                    if (toRest(del)->isGap())
                                           undoRemoveElement(del);
-                                          checkSpanner(del->tick(), del->tick());
-                                          }
                                     }
+                              checkSpanner(m->tick(), m->endTick());
                               }
                         else {
                               // check if the other rest could be combined
@@ -4602,6 +4601,7 @@ void Score::undoRemoveElement(Element* element)
                         undo(new RemoveElement(s));
                   }
             }
+      checkSpanner(element->tick(), element->tick());
       }
 
 //---------------------------------------------------------
