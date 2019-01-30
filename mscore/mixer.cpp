@@ -306,7 +306,7 @@ void Mixer::updateTracks()
             if (!_score->parts().isEmpty())
                   {
                   selPart = _score->parts()[0];
-                  selChan = selPart->instrument(0)->channel(0);
+                  selChan = selPart->instrument(Fraction(0,1))->channel(0);
                   }
 
             }

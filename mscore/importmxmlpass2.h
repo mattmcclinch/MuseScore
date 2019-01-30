@@ -84,7 +84,7 @@ public:
       MusicXmlLyricsExtend() {}
       void init();
       void addLyric(Lyrics* const lyric);
-      void setExtend(const int no, const int track, const int tick);
+      void setExtend(const int no, const int track, const Fraction& tick);
 
 private:
       QSet<Lyrics*> _lyrics;
@@ -121,13 +121,13 @@ public:
       void measChordNote( /*, const MxmlPhase2Note note, ChordRest& currChord */);
       void measChordFlush( /*, ChordRest& currChord */);
       void measure(const QString& partId, const Fraction time);
-      void attributes(const QString& partId, Measure* measure, const int tick);
+      void attributes(const QString& partId, Measure* measure, const Fraction& tick);
       void measureStyle(Measure* measure);
       void print(Measure* measure);
       void barline(const QString& partId, Measure* measure);
-      void key(const QString& partId, Measure* measure, const int tick);
-      void clef(const QString& partId, Measure* measure, const int tick);
-      void time(const QString& partId, Measure* measure, const int tick);
+      void key(const QString& partId, Measure* measure, const Fraction& tick);
+      void clef(const QString& partId, Measure* measure, const Fraction& tick);
+      void time(const QString& partId, Measure* measure, const Fraction& tick);
       void divisions();
       void transpose(const QString& partId);
       Note* note(const QString& partId, Measure* measure, const Fraction sTime, const Fraction prevTime,
@@ -146,14 +146,14 @@ public:
       void timeModification(Fraction& timeMod, TDuration& normalType);
       //void pitch(int& step, int& alter, int& oct, AccidentalType& accid);
       void lyric(const QString& partId, QMap<int, Lyrics*>& numbrdLyrics, QSet<Lyrics*>& extLyrics);
-      void slur(ChordRest* cr, const int tick, const int track, bool& lastGraceAFter);
+      void slur(ChordRest* cr, const Fraction& tick, const int track, bool& lastGraceAFter);
       void tied(Note* note, const int track);
       void articulations(ChordRest* cr, SymId& breath, QString& chordLineType);
       void dynamics(QString& placement, QStringList& dynamics);
       void ornaments(ChordRest* cr, QString& wavyLineType, int& wavyLineNo, QString& tremoloType, int& tremoloNr, bool& lastGraceAFter);
       void technical(Note* note, ChordRest* cr);
-      void glissando(Note* note, const int tick, const int ticks, const int track);
-      void notations(Note* note, ChordRest* cr, const int tick, MusicXmlTupletDesc& tupletDesc, bool& lastGraceAFter);
+      void glissando(Note* note, const Fraction& tick, const Fraction& ticks, const int track);
+      void notations(Note* note, ChordRest* cr, const Fraction& tick, MusicXmlTupletDesc& tupletDesc, bool& lastGraceAFter);
       void stem(Direction& sd, bool& nost);
       void fermata(ChordRest* cr);
       void tuplet(MusicXmlTupletDesc& tupletDesc);
@@ -220,7 +220,7 @@ private:
 class MusicXMLParserDirection {
 public:
       MusicXMLParserDirection(QXmlStreamReader& e, Score* score, const MusicXMLParserPass1& pass1, MusicXMLParserPass2& pass2, MxmlLogger* logger);
-      void direction(const QString& partId, Measure* measure, const int tick, MusicXmlSpannerMap& spanners);
+      void direction(const QString& partId, Measure* measure, const Fraction& tick, MusicXmlSpannerMap& spanners);
 
 private:
       QXmlStreamReader& _e;

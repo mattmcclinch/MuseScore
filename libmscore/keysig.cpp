@@ -136,7 +136,7 @@ void KeySig::layout()
       // If we're not force hiding naturals (Continuous panel), use score style settings
       if (!_hideNaturals) {
             const bool newSection = (!segment()
-               || (segment()->rtick() == 0 && (!prevMeasure || prevMeasure->sectionBreak()))
+               || (segment()->rtick().isZero() && (!prevMeasure || prevMeasure->sectionBreak()))
                );
             naturalsOn = !newSection && (score()->styleI(Sid::keySigNaturals) != int(KeySigNatural::NONE) || (t1 == 0));
             }
@@ -154,7 +154,7 @@ void KeySig::layout()
       Key t2      = Key::C;
       if (naturalsOn) {
             if (staff())
-                  t2 = staff()->key(tick() - 1);
+                  t2 = staff()->key(tick() - Fraction(1, 480*4));
             if (t2 == Key::C)
                   naturalsOn = false;
             else {
@@ -515,15 +515,6 @@ void KeySig::changeKeySigEvent(const KeySigEvent& t)
       if (_sig == t)
             return;
       setKeySigEvent(t);
-      }
-
-//---------------------------------------------------------
-//   tick
-//---------------------------------------------------------
-
-int KeySig::tick() const
-      {
-      return segment() ? segment()->tick() : 0;
       }
 
 //---------------------------------------------------------
