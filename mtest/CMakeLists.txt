@@ -229,9 +229,9 @@ subdirs (
         importmidi
         capella
         biab
-        musicxml
-        guitarpro
-        scripting
+#        musicxml             ws:disabled during fraction migration
+#        guitarpro            ws:disabled during fraction migration
+#        scripting            ws:disabled during fraction migration
         stringutils
 #        testoves
         zerberus/comments
@@ -241,7 +241,7 @@ subdirs (
         zerberus/opcodeparse
         zerberus/inputControls
         zerberus/loop
-        testscript
+#        testscript           ws:disabled during fraction migration
         )
 
 
