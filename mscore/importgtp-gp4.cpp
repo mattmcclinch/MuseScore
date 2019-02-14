@@ -902,6 +902,7 @@ bool GuitarPro4::read(QFile* fp)
                                     cr = new Chord(score);
                               }
 
+                        cr->setParent(segment);
                         cr->setTrack(track);
                         if (lyrics)
                               cr->add(lyrics);

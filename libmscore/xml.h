@@ -74,6 +74,7 @@ class XmlReader : public QXmlStreamReader {
       // Score read context (for read optimizations):
       Fraction _tick             { Fraction(0, 1) };
       Fraction _tickOffset       { Fraction(0, 1) };
+      int _intTick          { 0       };
       int _track            { 0       };
       int _trackOffset      { 0       };
       bool _pasteMode       { false   };        // modifies read behaviour on paste operation
