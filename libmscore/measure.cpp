@@ -2819,6 +2819,7 @@ Measure* Measure::cloneMeasure(Score* sc, TieMap* tieMap)
 
       for (Segment* oseg = first(); oseg; oseg = oseg->next()) {
             Segment* s = new Segment(m, oseg->segmentType(), oseg->rtick());
+            s->setEnabled(oseg->enabled());
             m->_segments.push_back(s);
             for (int track = 0; track < tracks; ++track) {
                   Element* oe = oseg->element(track);
