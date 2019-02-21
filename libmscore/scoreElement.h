@@ -271,7 +271,6 @@ class ScoreElement {
       CONVERT(TempoText,     TEMPO_TEXT)
       CONVERT(Breath,        BREATH)
       CONVERT(HBox,          HBOX)
-      CONVERT(VBox,          VBOX)
       CONVERT(TBox,          TBOX)
       CONVERT(FBox,          FBOX)
       CONVERT(Tie,           TIE)
@@ -357,7 +356,8 @@ class ScoreElement {
       bool isDurationElement() const { return isChordRest() || isTuplet(); }
       bool isSlurTieSegment() const  { return isSlurSegment() || isTieSegment(); }
       bool isSLineSegment() const;
-      bool isBox() const { return isVBox() || isHBox() || isTBox() || isFBox(); }
+      bool isVBox() const { return (type() == ElementType::VBOX) || isTBox() || isFBox(); }
+      bool isBox() const { return isVBox() || isHBox(); }
       bool isMeasureBase() const { return isMeasure() || isBox(); }
       bool isTextBase() const;
       bool isTextLineBaseSegment() const {
