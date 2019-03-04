@@ -48,7 +48,7 @@ FretDiagram::FretDiagram(Score* score)
    : Element(score, ElementFlag::MOVABLE | ElementFlag::ON_STAFF)
       {
       font.setFamily("FreeSans");
-      font.setPointSize(4.0 * mag());
+      font.setPointSizeF(4.0 * mag());
       initElementStyle(&fretStyle);
       }
 
@@ -63,6 +63,7 @@ FretDiagram::FretDiagram(const FretDiagram& f)
       font        = f.font;
       _barre      = f._barre;
       _userMag    = f._userMag;
+      _numPos     = f._numPos;
 
       if (f._dots) {
             _dots = new char[_strings];
@@ -270,7 +271,7 @@ void FretDiagram::init(StringData* stringData, Chord* chord)
 
 void FretDiagram::draw(QPainter* painter) const
       {
-      qreal _spatium = spatium() * _userMag * score()->styleD(Sid::fretMag);
+      qreal _spatium = spatium() * _userMag;
       QPen pen(curColor());
       pen.setWidthF(lw2);
       pen.setCapStyle(Qt::FlatCap);
@@ -291,7 +292,7 @@ void FretDiagram::draw(QPainter* painter) const
             painter->drawLine(QLineF(0.0, y, x2, y));
             }
       QFont scaledFont(font);
-      scaledFont.setPointSizeF(font.pointSize() * _userMag * score()->styleD(Sid::fretMag));
+      scaledFont.setPointSizeF(font.pointSizeF() * _userMag * (spatium() / SPATIUM20));
       QFontMetricsF fm(scaledFont, MScore::paintDevice());
       scaledFont.setPointSizeF(scaledFont.pointSizeF() * MScore::pixelRatio);
 
@@ -331,7 +332,7 @@ void FretDiagram::draw(QPainter* painter) const
             }
       if (_fretOffset > 0) {
             qreal fretNumMag = score()->styleD(Sid::fretNumMag);
-            scaledFont.setPointSizeF(font.pointSize() * fretNumMag * _userMag * score()->styleD(Sid::fretMag) * MScore::pixelRatio);
+            scaledFont.setPointSizeF(font.pointSizeF() * fretNumMag * _userMag * MScore::pixelRatio * (spatium() / SPATIUM20));
             painter->setFont(scaledFont);
             if (_numPos == 0) {
                   painter->drawText(QRectF(-stringDist *.4, .0, .0, fretDist),
@@ -353,7 +354,7 @@ void FretDiagram::draw(QPainter* painter) const
 
 void FretDiagram::layout()
       {
-      qreal _spatium  = spatium() * _userMag * score()->styleD(Sid::fretMag);
+      qreal _spatium  = spatium() * _userMag;
       lw1             = _spatium * 0.08;
       lw2             = _fretOffset ? lw1 : _spatium * 0.2;
       stringDist      = _spatium * .7;
@@ -367,7 +368,7 @@ void FretDiagram::layout()
       w         += dotd + lw1;
       if (_marker) {
             QFont scaledFont(font);
-            scaledFont.setPointSize(font.pointSize() * _userMag);
+            scaledFont.setPointSizeF(font.pointSizeF() * _userMag * (spatium() / SPATIUM20));
             QFontMetricsF fm(scaledFont, MScore::paintDevice());
             y  = -(fretDist * .1 + fm.height());
             h -= y;

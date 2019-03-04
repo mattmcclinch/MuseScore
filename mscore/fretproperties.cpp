@@ -282,7 +282,7 @@ void FretCanvas::mousePressEvent(QMouseEvent* ev)
                   }
             else {
                   diagram->score()->undo(new FretDot(diagram, string, fret));
-                  diagram->score()->undo(new FretMarker(diagram, string, 'O'));
+                  diagram->score()->undo(new FretMarker(diagram, string, 0));
 
                   if (ev->modifiers() & Qt::ShiftModifier)
                         diagram->undoChangeProperty(Pid::FRET_BARRE, diagram->barre() == fret ? 0 : fret);
