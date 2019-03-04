@@ -4858,6 +4858,9 @@ FretDiagram* MusicXMLParserPass2::frame()
 
       FretDiagram* fd = new FretDiagram(_score);
 
+      return fd;  // NOTE:JT todo
+
+#if 0
       while (_e.readNextStartElement()) {
             if (_e.name() == "frame-frets") {
                   int val = _e.readElementText().toInt();
@@ -4900,6 +4903,7 @@ FretDiagram* MusicXMLParserPass2::frame()
             }
 
       return fd;
+#endif
       }
 
 //---------------------------------------------------------

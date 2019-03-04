@@ -21,6 +21,69 @@ class StringData;
 class Chord;
 class Harmony;
 
+enum class FretDotType : signed char {
+      NORMAL
+      };
+
+enum class FretMarkerType : signed char {
+      NONE,
+      CIRCLE,
+      CROSS
+      };
+
+class FretItem {
+   public:
+      struct Barre {
+            int startString;
+            int endString;
+
+            Barre() { startString = endString = -1; }
+            Barre(int s, int e) : startString(s), endString(e) {}
+            bool exists() const { return startString > -1; }
+            };
+
+      struct Dot {
+            int fret                { 0 };
+            FretDotType dtype       { FretDotType::NORMAL };
+            int fingering;          // NOTE:JT - possible future feature?
+
+            Dot() {}
+            Dot(int f, FretDotType t = FretDotType::NORMAL) : fret(f), dtype(t) {}
+            bool exists() const { return fret > 0; }
+            };
+
+      struct Marker {
+            FretMarkerType mtype;
+
+            Marker() { mtype = FretMarkerType::NONE; }
+            Marker(FretMarkerType t) : mtype(t) {}
+            bool exists() const { return mtype != FretMarkerType::NONE; }
+            };
+
+      struct MarkerTypeNameItem {
+            FretMarkerType mtype;
+            const char* name;
+            };
+
+      struct DotTypeNameItem {
+            FretDotType dtype;
+            const char* name;
+            };
+
+      static const std::vector<FretItem::MarkerTypeNameItem> markerTypeNameMap;
+      static const std::vector<FretItem::DotTypeNameItem> dotTypeNameMap;
+
+      static QChar markerToChar(FretMarkerType t);
+      static QString markerTypeToName(FretMarkerType t);
+      static FretMarkerType nameToMarkerType(QString n);
+      static QString dotTypeToName(FretDotType t);
+      static FretDotType nameToDotType(QString n);
+      };
+
+typedef std::map<int, FretItem::Barre> BarreMap;
+typedef std::map<int, FretItem::Marker> MarkerMap;
+typedef std::map<int, std::vector<FretItem::Dot>> DotMap;
+
 //---------------------------------------------------------
 //   @@ FretDiagram
 ///    Fretboard diagram
@@ -28,21 +91,27 @@ class Harmony;
 //   @P userMag    qreal
 //   @P strings    int  number of strings
 //   @P frets      int  number of frets
-//   @P barre      int  barre
 //   @P fretOffset int
+//
+//   Note that, while strings are zero-indexed, frets are one-indexed
 //---------------------------------------------------------
 
 class FretDiagram final : public Element {
-      int _strings;
-      int maxStrings     { 0 };
-      int _frets;
+      int _strings       { 6  };
+      int _frets         { 4  };
       int _fretOffset    { 0  };
       int _maxFrets      { 24 };
-      int _barre         { 0 };
+      
+      // Barres are stored in the format: K: fret, V: barre struct
+      BarreMap _barres;
 
-      char* _dots        { 0 };
-      char* _marker      { 0 };
-      char* _fingering   { 0 };
+      // Dots stored as K: string, V: dot struct
+      DotMap _dots;
+
+      // Markers stored as K: string, V: marker struct
+      MarkerMap _markers;
+
+      int _fingering;  // PLACEHOLDER
 
       Harmony* _harmony  { 0 };
 
@@ -54,10 +123,15 @@ class FretDiagram final : public Element {
       qreal _userMag     { 1.0   };             // allowed 0.1 - 10.0
       int _numPos;
 
+      void removeDot(int s, int f = 0);
+      void removeBarre(int f);
+      void removeBarres(int string, int fret = 0);
+      void removeMarker(int s);
+      void removeDotsMarkers(int ss, int es, int fret);
+
    public:
       FretDiagram(Score* s);
       FretDiagram(const FretDiagram&);
-      ~FretDiagram();
       virtual void draw(QPainter*) const override;
       virtual FretDiagram* clone() const override { return new FretDiagram(*this); }
 
@@ -69,6 +143,7 @@ class FretDiagram final : public Element {
       virtual void layout() override;
       virtual void write(XmlWriter& xml) const override;
       virtual void read(XmlReader&) override;
+      void read1(XmlReader&);
       virtual QLineF dragAnchor() const override;
       virtual QPointF pagePos() const override;
 
@@ -76,23 +151,36 @@ class FretDiagram final : public Element {
       void readMusicXML(XmlReader& de);
       void writeMusicXML(XmlWriter& xml) const;
 
-      int strings() const    { return _strings; }
-      int frets()   const    { return _frets; }
+      int  strings() const    { return _strings; }
+      int  frets()   const    { return _frets; }
       void setStrings(int n);
       void setFrets(int n)        { _frets = n; }
-      void setDot(int string, int fret);
-      void setBarre(int fret)     { _barre = fret; }
-      void setMarker(int string, int marker);
+
+      void setDot(int string, int fret, bool add = false, FretDotType dtype = FretDotType::NORMAL);
+      void setBarre(int startString, int endString, int fret);
+      void setBarre(int string, int fret);
+      void setMarker(int string, FretMarkerType marker);
       void setFingering(int string, int finger);
-      int fretOffset() const      { return _fretOffset; }
-      void setFretOffset(int val) { _fretOffset = val;  }
-      int maxFrets() const        { return _maxFrets;   }
+      int  fretOffset() const     { return _fretOffset; }
+      void setFretOffset(int val);
+      int  maxFrets() const       { return _maxFrets;   }
       void setMaxFrets(int val)   { _maxFrets = val;    }
 
-      char dot(int s) const       { return _dots      ? _dots[s]      : 0; }
-      char marker(int s) const    { return _marker    ? _marker[s]    : 0; }
-      char fingering(int s) const { return _fingering ? _fingering[s] : 0; }
-      int barre() const           { return _barre; }
+      std::vector<FretItem::Dot> dot(int s, int f = 0) const;
+      FretItem::Marker marker(int s) const;
+      FretItem::Barre barre(int fret) const;
+#if 0 // NOTE:JT possible future feature
+      int fingering(int s) const       { return _fingering ? _fingering[s] : 0; }
+#endif
+
+      // WARNING: The following functions are dangerous, only use in undo functions
+      BarreMap barres() const             { return _barres; }
+      void setBarres(BarreMap barres)     { _barres = barres; }
+      DotMap dots() const                 { return _dots; }
+      void setDots(DotMap dots)           { _dots = dots; }
+      MarkerMap markers() const           { return _markers; }
+      void setMarkers(MarkerMap markers)  { _markers = markers; }
+      // end dangerous functions
 
       Harmony* harmony() const { return _harmony; }
 

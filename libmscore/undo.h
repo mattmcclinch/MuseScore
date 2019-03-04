@@ -39,6 +39,7 @@
 #include "note.h"
 #include "drumset.h"
 #include "rest.h"
+#include "fret.h"
 
 Q_DECLARE_LOGGING_CATEGORY(undoRedo)
 
@@ -1306,14 +1307,21 @@ class ChangeGap : public UndoCommand {
 //---------------------------------------------------------
 
 class FretDot : public UndoCommand {
-      FretDiagram* fret;
+      FretDiagram* diagram;
       int string;
-      int dot;
+      int fret;
+      bool add;
+      FretDotType dtype;
+      BarreMap barres;
+      MarkerMap markers;
+      DotMap dots;
 
-      void flip(EditData*) override;
+      void redo(EditData*) override;
+      void undo(EditData*) override;
 
    public:
-      FretDot(FretDiagram* f, int _string, int _dot) : fret(f), string(_string), dot(_dot) {}
+      FretDot(FretDiagram* d, int _string, int _fret, bool _add = false, FretDotType _dtype = FretDotType::NORMAL)
+         : diagram(d), string(_string), fret(_fret), add(_add), dtype(_dtype) {}
       UNDO_NAME("FretDot")
       };
 
@@ -1322,15 +1330,38 @@ class FretDot : public UndoCommand {
 //---------------------------------------------------------
 
 class FretMarker : public UndoCommand {
-      FretDiagram* fret;
+      FretDiagram* diagram;
       int string;
-      int marker;
+      FretMarkerType mtype;
+      BarreMap barres;
+      DotMap dots;
 
-      void flip(EditData*) override;
+      void redo(EditData*) override;
+      void undo(EditData*) override;
 
    public:
-      FretMarker(FretDiagram* f, int _string, int _marker) : fret(f), string(_string), marker(_marker) {}
+      FretMarker(FretDiagram* d, int _string, FretMarkerType _mtype) : diagram(d), string(_string), mtype(_mtype) {}
       UNDO_NAME("FretMarker")
+      };
+
+//---------------------------------------------------------
+//   FretBarre
+//---------------------------------------------------------
+
+class FretBarre : public UndoCommand {
+      FretDiagram* diagram;
+      int string;
+      int fret;
+      MarkerMap markers;
+      DotMap dots;
+      BarreMap barres;
+
+      void redo(EditData*) override;
+      void undo(EditData*) override;
+
+   public:
+      FretBarre(FretDiagram* d, int _string, int _fret) : diagram(d), string(_string), fret(_fret) {}
+      UNDO_NAME("FretBarre")
       };
 
 //---------------------------------------------------------

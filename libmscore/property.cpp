@@ -212,7 +212,9 @@ static constexpr PropertyMetaData propertyList[] = {
       { Pid::GLISSANDO_STYLE,         true,  "glissandoStyle",        P_TYPE::GLISSANDO_STYLE,     DUMMY_QT_TRANSLATE_NOOP("propertyName", "glissando style")  },
       { Pid::FRET_STRINGS,            false, "strings",               P_TYPE::INT,                 DUMMY_QT_TRANSLATE_NOOP("propertyName", "strings")          },
       { Pid::FRET_FRETS,              false, "frets",                 P_TYPE::INT,                 DUMMY_QT_TRANSLATE_NOOP("propertyName", "frets")            },
+#if 0       // NOTE:JT to remove
       { Pid::FRET_BARRE,              false, "barre",                 P_TYPE::INT,                 DUMMY_QT_TRANSLATE_NOOP("propertyName", "barre")            },
+#endif
       { Pid::FRET_OFFSET,             false, "fretOffset",            P_TYPE::INT,                 DUMMY_QT_TRANSLATE_NOOP("propertyName", "fret offset")      },
 
       { Pid::FRET_NUM_POS,            false, "fretNumPos",            P_TYPE::INT,                 DUMMY_QT_TRANSLATE_NOOP("propertyName", "fret number position") },

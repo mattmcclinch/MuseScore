@@ -2365,24 +2365,80 @@ void ChangeGap::flip(EditData*)
 //   FretDot
 //---------------------------------------------------------
 
-void FretDot::flip(EditData*)
+void FretDot::redo(EditData*)
       {
-      int ov = fret->dot(string);
-      fret->setDot(string, dot);
-      dot = ov;
-      fret->triggerLayout();
+      // We need to store the old barres and markers, since adding dots can
+      // remove barres and markers that are in the way.
+      barres = diagram->barres();
+      markers = diagram->markers();
+      dots = diagram->dots();
+
+      diagram->setDot(string, fret, add, dtype);
+
+      diagram->triggerLayout();
+      }
+
+
+void FretDot::undo(EditData*)
+      {
+      diagram->setBarres(barres);
+      diagram->setMarkers(markers);
+      diagram->setDots(dots);
+
+      diagram->triggerLayout();
       }
 
 //---------------------------------------------------------
 //   FretMarker
 //---------------------------------------------------------
 
-void FretMarker::flip(EditData*)
+void FretMarker::redo(EditData*)
       {
-      int om = fret->marker(string);
-      fret->setMarker(string, marker);
-      marker = om;
-      fret->triggerLayout();
+      barres = diagram->barres();
+      dots = diagram->dots();
+      
+      FretMarkerType oldMarker = diagram->marker(string).mtype;
+
+      diagram->setMarker(string, mtype);
+
+      mtype = oldMarker;
+      diagram->triggerLayout();
+      }
+
+void FretMarker::undo(EditData*)
+      {      
+      FretMarkerType oldMarker = diagram->marker(string).mtype;
+
+      diagram->setMarker(string, mtype);
+
+      diagram->setBarres(barres);
+      diagram->setDots(dots);
+
+      mtype = oldMarker;
+      diagram->triggerLayout();
+      }
+
+//---------------------------------------------------------
+//   FretBarre
+//---------------------------------------------------------
+
+void FretBarre::redo(EditData*)
+      {
+      barres = diagram->barres();
+      dots = diagram->dots();
+      markers = diagram->markers();
+
+      diagram->setBarre(string, fret);
+      diagram->triggerLayout();
+      }
+
+void FretBarre::undo(EditData*)
+      {
+      diagram->setBarres(barres);
+      diagram->setDots(dots);
+      diagram->setMarkers(markers);
+
+      diagram->triggerLayout();
       }
 
 //---------------------------------------------------------

@@ -397,6 +397,9 @@ void GuitarPro6::readMasterTracks(QDomNode* masterTrack)
 
 void GuitarPro6::readChord(QDomNode* diagram, int track)
       {
+      return; // NOTE:JT todo
+
+#if 0
       // initialize a new fret diagram for our current track
       FretDiagram* fretDiagram = new FretDiagram(score);
       fretDiagram->setTrack(track);
@@ -454,6 +457,7 @@ void GuitarPro6::readChord(QDomNode* diagram, int track)
 
       // insert the fret diagram into the map of diagrams
       fretDiagrams.insert(id, fretDiagram);
+#endif
       }
 
 //---------------------------------------------------------

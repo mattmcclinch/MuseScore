@@ -36,7 +36,7 @@ InspectorFretDiagram::InspectorFretDiagram(QWidget* parent)
             { Pid::PLACEMENT,    0, f.placement,   f.resetPlacement   },
             { Pid::FRET_STRINGS, 0, f.strings,     f.resetStrings     },
             { Pid::FRET_FRETS,   0, f.frets,       f.resetFrets       },
-            { Pid::FRET_BARRE,   0, f.barre,       f.resetBarre       },
+            /*{ Pid::FRET_BARRE,   0, f.barre,       f.resetBarre       },*/
             };
       const std::vector<InspectorPanel> ppList = {
             { f.title, f.panel }

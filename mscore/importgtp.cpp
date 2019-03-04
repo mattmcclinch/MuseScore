@@ -1295,6 +1295,9 @@ void GuitarPro::setTempo(int temp, Measure* measure)
 
 void GuitarPro::readChord(Segment* seg, int track, int numStrings, QString name, bool gpHeader)
       {
+      return;     // NOTE:JT todo
+
+#if 0
       int firstFret = readInt();
       if (firstFret || gpHeader) {
             FretDiagram* fret = new FretDiagram(score);
@@ -1333,6 +1336,7 @@ void GuitarPro::readChord(Segment* seg, int track, int numStrings, QString name,
             harmony->setTrack(track);
             seg->add(harmony);
             }
+#endif
       }
 
 //---------------------------------------------------------
