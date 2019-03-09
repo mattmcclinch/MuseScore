@@ -29,6 +29,8 @@
 #include "palettebox.h"
 #include "extension.h"
 
+#define ALLOW_MENU_SWITCHING (QT_VERSION > QT_VERSION_CHECK(5, 9, 7))
+
 namespace Ms {
 
 bool Workspace::workspacesRead = false;
@@ -684,6 +686,7 @@ void Workspace::read(XmlReader& e)
                         }
                   }
             else if (tag == "MenuBar") {
+#if ALLOW_MENU_SWITCHING
                   saveMenuBar = true;
                   QMenuBar* mb = mscore->menuBar();
                   mb->clear();
@@ -712,6 +715,11 @@ void Workspace::read(XmlReader& e)
                                     }
                               }
                         }
+#else
+                  while (e.readNextStartElement())
+                        if (e.hasAttribute("name")) // is a menu
+                              readMenu(e, nullptr);
+#endif
                   }
             else if (tag == "State") {
                   saveComponents = true;
@@ -752,6 +760,7 @@ void Workspace::read(XmlReader& e)
 
 void Workspace::readMenu(XmlReader& e, QMenu* menu)
       {
+#if ALLOW_MENU_SWITCHING
       while (e.readNextStartElement()) {
             if (e.hasAttribute("name")) { // is a menu
                   QString menu_id = e.attribute("name");
@@ -777,6 +786,11 @@ void Workspace::readMenu(XmlReader& e, QMenu* menu)
                         }
                   }
             }
+#else
+      while (e.readNextStartElement())
+            if (e.hasAttribute("name")) // is a menu
+                  readMenu(e, nullptr);
+#endif
       }
 
 //---------------------------------------------------------
@@ -797,6 +811,7 @@ void Workspace::readGlobalMenuBar()
             if (e.name() == "museScore") {
                   while (e.readNextStartElement()) {
                         if (e.name() == "MenuBar") {
+#if ALLOW_MENU_SWITCHING
                               QMenuBar* mb = mscore->menuBar();
                               mb->clear();
                               while (e.readNextStartElement()) {
@@ -824,6 +839,11 @@ void Workspace::readGlobalMenuBar()
                                                 }
                                           }
                                     }
+#else
+                              while (e.readNextStartElement())
+                                    if (e.hasAttribute("name")) // is a menu
+                                          readMenu(e, nullptr);
+#endif
                               }
                         else
                               e.unknown();
@@ -1068,10 +1088,12 @@ Workspace* Workspace::createNewWorkspace(const QString& name)
 
 void Workspace::addActionAndString(QAction* action, QString string)
       {
+#if ALLOW_MENU_SWITCHING
       QPair<QAction*, QString> pair;
       pair.first = action;
       pair.second = string;
       actionToStringList.append(pair);
+#endif
       }
 
 //---------------------------------------------------------
@@ -1080,6 +1102,7 @@ void Workspace::addActionAndString(QAction* action, QString string)
 
 void Workspace::addRemainingFromMenuBar(QMenuBar* mb)
       {
+#if ALLOW_MENU_SWITCHING
       // Loop through each menu in menubar. For each menu, call writeMenu.
       for (QAction* action : mb->actions()) {
             if (action->isSeparator())
@@ -1089,6 +1112,7 @@ void Workspace::addRemainingFromMenuBar(QMenuBar* mb)
             else if (!action->data().toString().isEmpty())
                   addActionAndString(action, action->data().toString());
             }
+#endif
       }
 
 //---------------------------------------------------------
@@ -1097,6 +1121,7 @@ void Workspace::addRemainingFromMenuBar(QMenuBar* mb)
 
 void Workspace::addRemainingFromMenu(QMenu* menu)
       {
+#if ALLOW_MENU_SWITCHING
       // Recursively save QMenu
       for (QAction* action : menu->actions()) {
             if (action->isSeparator())
@@ -1106,7 +1131,8 @@ void Workspace::addRemainingFromMenu(QMenu* menu)
             else if (!action->data().toString().isEmpty())
                   addActionAndString(action, action->data().toString());
             }
-      }
+#endif
+     }
 
 //---------------------------------------------------------
 //   findActionFromString
@@ -1114,10 +1140,12 @@ void Workspace::addRemainingFromMenu(QMenu* menu)
 
 QAction* Workspace::findActionFromString(QString string)
       {
+#if ALLOW_MENU_SWITCHING
       for (auto pair : actionToStringList) {
             if (pair.second == string)
                   return pair.first;
             }
+#endif
       return 0;
       }
 
@@ -1127,10 +1155,12 @@ QAction* Workspace::findActionFromString(QString string)
 
 QString Workspace::findStringFromAction(QAction* action)
       {
+#if ALLOW_MENU_SWITCHING
       for (auto pair : actionToStringList) {
             if (pair.first == action)
                   return pair.second;
             }
+#endif
       return 0;
       }
 
@@ -1140,10 +1170,12 @@ QString Workspace::findStringFromAction(QAction* action)
 
 void Workspace::addMenuAndString(QMenu* menu, QString string)
       {
+#if ALLOW_MENU_SWITCHING
       QPair<QMenu*, QString> pair;
       pair.first = menu;
       pair.second = string;
       menuToStringList.append(pair);
+ #endif
       }
 
 //---------------------------------------------------------
@@ -1152,10 +1184,12 @@ void Workspace::addMenuAndString(QMenu* menu, QString string)
 
 QMenu* Workspace::findMenuFromString(QString string)
       {
+#if ALLOW_MENU_SWITCHING
       for (auto pair : menuToStringList) {
             if (pair.second == string)
                   return pair.first;
             }
+#endif
       return 0;
       }
 
@@ -1165,10 +1199,12 @@ QMenu* Workspace::findMenuFromString(QString string)
 
 QString Workspace::findStringFromMenu(QMenu* menu)
       {
+#if ALLOW_MENU_SWITCHING
       for (auto pair : menuToStringList) {
             if (pair.first == menu)
                   return pair.second;
             }
+#endif
       return 0;
       }
 
