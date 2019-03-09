@@ -61,6 +61,7 @@ FretDiagram::FretDiagram(const FretDiagram& f)
       _maxFrets   = f._maxFrets;
       font        = f.font;
       _userMag    = f._userMag;
+      _numPos     = f._numPos;
       _dots       = f._dots;
       _markers    = f._markers;
       _barres     = f._barres;
@@ -293,7 +294,7 @@ void FretDiagram::draw(QPainter* painter) const
             painter->drawLine(QLineF(0.0, y, x2, y));
             }
       QFont scaledFont(font);
-      scaledFont.setPointSizeF(font.pointSize() * _userMag * score()->styleD(Sid::fretMag));
+      scaledFont.setPointSizeF(font.pointSize() * _userMag * score()->styleD(Sid::fretMag) * (spatium() / SPATIUM20));
       QFontMetricsF fm(scaledFont, MScore::paintDevice());
       scaledFont.setPointSizeF(scaledFont.pointSizeF() * MScore::pixelRatio);
 
@@ -338,7 +339,7 @@ void FretDiagram::draw(QPainter* painter) const
             qreal x1    = stringDist * startString;
             qreal newX2 = endString == -1 ? x2 : stringDist * endString;
             qreal y     = fretDist * (fret - 1) + fretDist * .5;
-            pen.setWidthF((dotd + lw2 * .5) * score()->styleD(Sid::barreLineWidth));
+            pen.setWidthF(dotd * .8 * score()->styleD(Sid::barreLineWidth));
             pen.setCapStyle(Qt::RoundCap);
             painter->setPen(pen);
             painter->drawLine(QLineF(x1, y, newX2, y));
@@ -347,7 +348,7 @@ void FretDiagram::draw(QPainter* painter) const
       // Draw fret offset number
       if (_fretOffset > 0) {
             qreal fretNumMag = score()->styleD(Sid::fretNumMag);
-            scaledFont.setPointSizeF(font.pointSize() * fretNumMag * _userMag * score()->styleD(Sid::fretMag) * MScore::pixelRatio);
+            scaledFont.setPointSizeF(scaledFont.pointSizeF() * fretNumMag);
             painter->setFont(scaledFont);
             if (_numPos == 0) {
                   painter->drawText(QRectF(-stringDist *.4, .0, .0, fretDist),

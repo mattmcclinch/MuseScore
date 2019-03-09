@@ -179,7 +179,6 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
       if ((cfret > 0) && (cfret <= _frets) && (cstring >= 0) && (cstring < _strings)) {
             double dotd;
 
-            // First check for 
             FretItem::Dot cd = diagram->dot(cstring, cfret)[0];
             std::vector<FretItem::Dot> otherDots = diagram->dot(cstring);
             if (cd.exists()) {
@@ -206,7 +205,7 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
             qreal newX2 = endString == -1 ? x2 : stringDist * endString;
 
             qreal y    = fretDist * (fret - 1) + fretDist * .5;
-            pen.setWidthF(stringDist * .6 * .7);      // don’t use style barreLineWidth
+            pen.setWidthF(stringDist * .6 * .8);      // don’t use style barreLineWidth
             pen.setCapStyle(Qt::RoundCap);
             p.setPen(pen);
             p.drawLine(QLineF(x1, y, newX2, y));
