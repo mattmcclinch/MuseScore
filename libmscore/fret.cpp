@@ -65,7 +65,6 @@ FretDiagram::FretDiagram(const FretDiagram& f)
       _dots       = f._dots;
       _markers    = f._markers;
       _barres     = f._barres;
-      _fingering  = f._fingering;
       _showNut    = f._showNut;
 
       if (f._harmony)
@@ -268,19 +267,26 @@ void FretDiagram::init(StringData* stringData, Chord* chord)
 
 void FretDiagram::draw(QPainter* painter) const
       {
+      // Init pen and other values
       qreal _spatium = spatium() * _userMag;
       QPen pen(curColor());
-      pen.setWidthF(lw2);
       pen.setCapStyle(Qt::FlatCap);
-      painter->setPen(pen);
       painter->setBrush(QBrush(QColor(painter->pen().color())));
+
+      // x2 is the x val of the rightmost string
       qreal x2 = (_strings-1) * stringDist;
-      painter->drawLine(QLineF(-lw1 * .5, 0.0, x2 + lw1 * .5, 0.0));
+
+      // Draw the nut
+      pen.setWidthF(nutLw);
+      painter->setPen(pen);
+      painter->drawLine(QLineF(-stringLw * .5, 0.0, x2 + stringLw * .5, 0.0));
 
       // Draw strings and frets
-      pen.setWidthF(lw1);
+      pen.setWidthF(stringLw);
       painter->setPen(pen);
-      qreal y2 = (_frets+1) * fretDist - fretDist * .5;
+
+      // y2 is the y val of the bottom fretline
+      qreal y2 = fretDist * (_frets + .5);
       for (int i = 0; i < _strings; ++i) {
             qreal x = stringDist * i;
             painter->drawLine(QLineF(x, _fretOffset ? -_spatium * .2 : 0.0, x, y2));
@@ -289,19 +295,23 @@ void FretDiagram::draw(QPainter* painter) const
             qreal y = fretDist * i;
             painter->drawLine(QLineF(0.0, y, x2, y));
             }
+
+      // Setup the font for the markers
       QFont scaledFont(font);
       scaledFont.setPointSizeF(font.pointSize() * _userMag * (spatium() / SPATIUM20));
       QFontMetricsF fm(scaledFont, MScore::paintDevice());
       scaledFont.setPointSizeF(scaledFont.pointSizeF() * MScore::pixelRatio);
 
       painter->setFont(scaledFont);
+
+      // dotd is the diameter of a dot
       qreal dotd = stringDist * .7;
 
-      // Draw dots and markers
+      // Draw dots, sym pen is used to draw them
       QPen symPen(pen);
       symPen.setCapStyle(Qt::RoundCap);
-      qreal symPenWidth = lw1 * 1.2;
-      symPen.setWidthF(lw1 * 1.2);
+      qreal symPenWidth = stringLw * 1.2;
+      symPen.setWidthF(symPenWidth);
 
       for (auto const& i : _dots) {
             for (auto const& d : i.second) {
@@ -311,6 +321,7 @@ void FretDiagram::draw(QPainter* painter) const
                   int string = i.first;
                   int fret = d.fret - 1;
 
+                  // Calculate coords of the top left corner of the dot
                   qreal x = stringDist * string - dotd * .5;
                   qreal y = fretDist * fret + fretDist * .5 - dotd * .5;
 
@@ -344,6 +355,7 @@ void FretDiagram::draw(QPainter* painter) const
                   }
             }
 
+      // Draw markers
       painter->setPen(pen);
       for (auto const& i : _markers) {
             int string = i.first;
@@ -400,8 +412,8 @@ void FretDiagram::draw(QPainter* painter) const
 void FretDiagram::layout()
       {
       qreal _spatium  = spatium() * _userMag;
-      lw1             = _spatium * 0.08;
-      lw2             = (_fretOffset || !_showNut) ? lw1 : _spatium * 0.2;
+      stringLw        = _spatium * 0.08;
+      nutLw           = (_fretOffset || !_showNut) ? stringLw : _spatium * 0.2;
       stringDist      = _spatium * .7;
       fretDist        = _spatium * .8;
 
@@ -409,8 +421,8 @@ void FretDiagram::layout()
       qreal h    = _frets * fretDist + fretDist * .5;
       qreal y    = 0.0;
       qreal dotd = stringDist * .7;
-      qreal x    = -((dotd+lw1) * .5);
-      w         += dotd + lw1;
+      qreal x    = -((dotd+stringLw) * .5);
+      w         += dotd + stringLw;
 
       // Always allocate space for markers
       QFont scaledFont(font);
@@ -454,6 +466,8 @@ void FretDiagram::layout()
 
 //---------------------------------------------------------
 //   write
+//    NOTICE: if you are looking to change how fret diagrams are
+//    written, edit the writeNew function. writeOld is purely compatability.
 //---------------------------------------------------------
 
 void FretDiagram::write(XmlWriter& xml) const
@@ -469,8 +483,18 @@ void FretDiagram::write(XmlWriter& xml) const
       writeNew(xml);
       xml.etag();
 
-      // The old method of writing starts here. This is for backwards
-      // compatability for < 3.1 versions.
+      writeOld(xml);
+      xml.etag();
+      }
+
+//---------------------------------------------------------
+//   writeOld
+//    This is the old method of writing. This is for backwards
+//    compatability with < 3.1 versions.
+//---------------------------------------------------------
+
+void FretDiagram::writeOld(XmlWriter& xml) const
+      {
       Element::writeProperties(xml);
       writeProperty(xml, Pid::FRET_STRINGS);
       writeProperty(xml, Pid::FRET_FRETS);
@@ -479,7 +503,8 @@ void FretDiagram::write(XmlWriter& xml) const
       if (_harmony)
             _harmony->write(xml);
 
-      int lowestDotFret = 100000;
+      int lowestDotFret = -1;
+      bool multipleDotsOnFret = false;
       for (int i = 0; i < _strings; ++i) {
             FretItem::Marker m = marker(i);
             std::vector<FretItem::Dot> allDots = dot(i);
@@ -503,29 +528,34 @@ void FretDiagram::write(XmlWriter& xml) const
             for (auto const& d : allDots) {
                   if (d.exists()) {
                         xml.tag("dot", d.fret);
-                        lowestDotFret = qMin(lowestDotFret, d.fret);
+                        if (d.fret < lowestDotFret || lowestDotFret == -1)
+                              lowestDotFret = d.fret;
+                        else if (d.fret == lowestDotFret)
+                              multipleDotsOnFret = true; 
                         }
                   }
 
             xml.etag();
             }
 
+      // The old system writes a barre as a bool, which causes no problems in anyway, not at all.
+      // So, only write that if the barre is on the lowest fret with a dot,
+      // and there are no other dots on its fret, and it goes all the way to the right.
       for (auto const& i : _barres) {
             FretItem::Barre b = i.second;
             if (b.exists()) {
                   int fret = i.first;
-                  if (lowestDotFret == fret && b.endString == -1) {
+                  if (lowestDotFret == fret && !multipleDotsOnFret && b.endString == -1) {
                         xml.tag("barre", 1);
                         break;
                         }
                   }
             }
-
-      xml.etag();
       }
 
 //---------------------------------------------------------
 //   writeNew
+//    This is the important one for 3.1+
 //---------------------------------------------------------
 
 void FretDiagram::writeNew(XmlWriter& xml) const
@@ -536,6 +566,7 @@ void FretDiagram::writeNew(XmlWriter& xml) const
       writeProperty(xml, Pid::FRET_FRETS);
       writeProperty(xml, Pid::FRET_OFFSET);
       writeProperty(xml, Pid::MAG);
+      writeProperty(xml, Pid::FRET_NUT);
       if (_harmony)
             _harmony->write(xml);
 
@@ -594,19 +625,18 @@ void FretDiagram::read(XmlReader& e)
 
       while (e.readNextStartElement()) {
             const QStringRef& tag(e.name());
-            qDebug() << "reading: " << tag;
 
+            // Check for new format fret diagram
             if (haveReadNew) {
-                  qDebug("skipping");
                   e.skipCurrentElement();
                   continue;
                   }
-            // Check for new format fret diagram
             if (tag == "fretDiagram") {
-                  qDebug("read new");
                   readNew(e);
                   haveReadNew = true;               
                   }
+
+            // Then read the rest if there is no new format diagram (compatability read)
             else if (tag == "strings")
                   readProperty(e, Pid::FRET_STRINGS);
             else if (tag == "frets")
@@ -661,7 +691,6 @@ void FretDiagram::readNew(XmlReader& e)
       {
       while (e.readNextStartElement()) {
             const QStringRef& tag(e.name());
-            qDebug() << "reading: " << tag;
 
             if (tag == "strings")
                   readProperty(e, Pid::FRET_STRINGS);

@@ -116,12 +116,10 @@ class FretDiagram final : public Element {
       // Markers stored as K: string, V: marker struct
       MarkerMap _markers;
 
-      int _fingering;  // PLACEHOLDER
-
       Harmony* _harmony  { 0 };
 
-      qreal lw1;
-      qreal lw2;             // top line
+      qreal stringLw;
+      qreal nutLw;
       qreal stringDist;
       qreal fretDist;
       QFont font;
@@ -148,6 +146,7 @@ class FretDiagram final : public Element {
       virtual void layout() override;
       virtual void write(XmlWriter& xml) const override;
       void writeNew(XmlWriter& xml) const;
+      void writeOld(XmlWriter& xml) const;
       virtual void read(XmlReader&) override;
       void readNew(XmlReader&);
       virtual QLineF dragAnchor() const override;
