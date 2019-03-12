@@ -565,8 +565,8 @@ void FretDiagram::writeNew(XmlWriter& xml) const
       writeProperty(xml, Pid::FRET_STRINGS);
       writeProperty(xml, Pid::FRET_FRETS);
       writeProperty(xml, Pid::FRET_OFFSET);
-      writeProperty(xml, Pid::MAG);
       writeProperty(xml, Pid::FRET_NUT);
+      writeProperty(xml, Pid::MAG);
       if (_harmony)
             _harmony->write(xml);
 
@@ -698,6 +698,8 @@ void FretDiagram::readNew(XmlReader& e)
                   readProperty(e, Pid::FRET_FRETS);
             else if (tag == "fretOffset")
                   readProperty(e, Pid::FRET_OFFSET);
+            else if (tag == "showNut")
+                  readProperty(e, Pid::FRET_NUT);
             else if (tag == "string") {
                   int no = e.intAttribute("no");
                   while (e.readNextStartElement()) {
@@ -1050,43 +1052,79 @@ void FretDiagram::scanElements(void* data, void (*func)(void*, Element*), bool a
 
 void FretDiagram::writeMusicXML(XmlWriter& xml) const
       {
-#if 0       // NOTE:JT todo
       qDebug("FretDiagram::writeMusicXML() this %p harmony %p", this, _harmony);
-      int strings_ = strings();
       xml.stag("frame");
-      xml.tag("frame-strings", strings_);
+      xml.tag("frame-strings", _strings);
       xml.tag("frame-frets", frets());
       QString strDots = "'";
       QString strMarker = "'";
       QString strFingering = "'";
-      for (int i = 0; i < strings_; ++i) {
-            // TODO print frame note
-            if (_dots)
-                  strDots += QString("%1'").arg(static_cast<int>(_dots[i]));
-            if (_marker)
-                  strMarker += QString("%1'").arg(static_cast<int>(_marker[i]));
-            if (_fingering)
-                  strFingering += QString("%1'").arg(static_cast<int>(_fingering[i]));
-            if (_marker[i] != 88) {
+
+      for (int i = 0; i < _strings; ++i) {
+            int mxmlString = _strings - i;
+
+            std::vector<int> bStarts;
+            std::vector<int> bEnds;
+            for (auto const& j : _barres) {
+                  FretItem::Barre b = j.second;
+                  int fret = j.first;
+                  if (!b.exists())
+                        continue;
+
+                  if (b.startString == i)
+                        bStarts.push_back(fret);
+                  else if (b.endString == i || (b.endString == -1 && mxmlString == 1))
+                        bEnds.push_back(fret);
+                  }
+
+            if (marker(i).exists() && marker(i).mtype == FretMarkerType::CIRCLE) {
                   xml.stag("frame-note");
-                  xml.tag("string", strings_ - i);
-                  if (_dots)
-                        xml.tag("fret", _dots[i]);
-                  else
-                        xml.tag("fret", "0");
+                  xml.tag("string", mxmlString);
+                  xml.tag("fret", "0");
+                  xml.etag();
+                  }
+            else {
+                  // Write dots
+                  for (auto const& d : dot(i)) {
+                        if (!d.exists())
+                              continue;
+                        xml.stag("frame-note");
+                        xml.tag("string", mxmlString);
+                        xml.tag("fret", d.fret);
+                        // TODO: write fingerings
+
+                        // Also write barre if it starts at this dot
+                        if (std::find(bStarts.begin(), bStarts.end(), d.fret) != bStarts.end()) {
+                              xml.tagE("barre type=\"start\"");
+                              bStarts.erase(std::remove(bStarts.begin(), bStarts.end(), d.fret), bStarts.end());
+                              }
+                        if (std::find(bEnds.begin(), bEnds.end(), d.fret) != bEnds.end()) {
+                              xml.tagE("barre type=\"stop\"");
+                              bEnds.erase(std::remove(bEnds.begin(), bEnds.end(), d.fret), bEnds.end());
+                              }
+                        xml.etag();
+                        }
+                  }
+
+            // Write unwritten barres
+            for (int j : bStarts) {
+                  xml.stag("frame-note");
+                  xml.tag("string", mxmlString);
+                  xml.tag("fret", j);
+                  xml.tagE("barre type=\"start\"");
+                  xml.etag();
+                  }
+
+            for (int j : bEnds) {
+                  xml.stag("frame-note");
+                  xml.tag("string", mxmlString);
+                  xml.tag("fret", j);
+                  xml.tagE("barre type=\"stop\"");
                   xml.etag();
                   }
             }
-      qDebug("FretDiagram::writeMusicXML() this %p dots %s marker %s fingering %s",
-             this, qPrintable(strDots), qPrintable(strMarker), qPrintable(strFingering));
-      /*
-      xml.tag("root-step", tpc2stepName(rootTpc));
-      int alter = tpc2alter(rootTpc);
-      if (alter)
-            xml.tag("root-alter", alter);
-      */
+
       xml.etag();
-#endif
       }
 
 //---------------------------------------------------------
