@@ -147,8 +147,9 @@ class FretDiagram final : public Element {
       virtual ElementType type() const override { return ElementType::FRET_DIAGRAM; }
       virtual void layout() override;
       virtual void write(XmlWriter& xml) const override;
+      void writeNew(XmlWriter& xml) const;
       virtual void read(XmlReader&) override;
-      void read1(XmlReader&);
+      void readNew(XmlReader&);
       virtual QLineF dragAnchor() const override;
       virtual QPointF pagePos() const override;
 
@@ -181,13 +182,14 @@ class FretDiagram final : public Element {
 #endif
 
       // WARNING: The following functions are dangerous, only use in undo functions
-      BarreMap barres() const             { return _barres; }
       void setBarres(BarreMap barres)     { _barres = barres; }
-      DotMap dots() const                 { return _dots; }
       void setDots(DotMap dots)           { _dots = dots; }
-      MarkerMap markers() const           { return _markers; }
       void setMarkers(MarkerMap markers)  { _markers = markers; }
       // end dangerous functions
+
+      BarreMap barres() const             { return _barres; }
+      DotMap dots() const                 { return _dots; }
+      MarkerMap markers() const           { return _markers; }
 
       Harmony* harmony() const { return _harmony; }
 

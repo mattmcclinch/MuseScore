@@ -344,6 +344,7 @@ void FretDiagram::draw(QPainter* painter) const
                   }
             }
 
+      painter->setPen(pen);
       for (auto const& i : _markers) {
             int string = i.first;
             FretItem::Marker marker = i.second;
@@ -459,12 +460,84 @@ void FretDiagram::write(XmlWriter& xml) const
       {
       if (!xml.canWrite(this))
             return;
-      xml.stag(this, "version=\"2\"");
+      xml.stag(this);
+
+      // Lowercase f indicates new writing format
+      // TODO: in the next score format version (4) use only write new and discard
+      // the compatability writing.
+      xml.stag("fretDiagram");
+      writeNew(xml);
+      xml.etag();
+
+      // The old method of writing starts here. This is for backwards
+      // compatability for < 3.1 versions.
+      Element::writeProperties(xml);
+      writeProperty(xml, Pid::FRET_STRINGS);
+      writeProperty(xml, Pid::FRET_FRETS);
+      writeProperty(xml, Pid::FRET_OFFSET);
+      writeProperty(xml, Pid::MAG);
+      if (_harmony)
+            _harmony->write(xml);
+
+      int lowestDotFret = 100000;
+      for (int i = 0; i < _strings; ++i) {
+            FretItem::Marker m = marker(i);
+            std::vector<FretItem::Dot> allDots = dot(i);
+
+            bool dotExists = false;
+            for (auto const& d : allDots) {
+                  if (d.exists()) {
+                        dotExists = true;
+                        break;
+                        }
+                  }
+
+            if (!dotExists && !m.exists())
+                  continue;
+
+            xml.stag(QString("string no=\"%1\"").arg(i));
+
+            if (m.exists())
+                  xml.tag("marker", FretItem::markerToChar(m.mtype).unicode());
+
+            for (auto const& d : allDots) {
+                  if (d.exists()) {
+                        xml.tag("dot", d.fret);
+                        lowestDotFret = qMin(lowestDotFret, d.fret);
+                        }
+                  }
+
+            xml.etag();
+            }
+
+      for (auto const& i : _barres) {
+            FretItem::Barre b = i.second;
+            if (b.exists()) {
+                  int fret = i.first;
+                  if (lowestDotFret == fret && b.endString == -1) {
+                        xml.tag("barre", 1);
+                        break;
+                        }
+                  }
+            }
+
+      xml.etag();
+      }
+
+//---------------------------------------------------------
+//   writeNew
+//---------------------------------------------------------
+
+void FretDiagram::writeNew(XmlWriter& xml) const
+      {
       Element::writeProperties(xml);
 
       writeProperty(xml, Pid::FRET_STRINGS);
       writeProperty(xml, Pid::FRET_FRETS);
       writeProperty(xml, Pid::FRET_OFFSET);
+      writeProperty(xml, Pid::MAG);
+      if (_harmony)
+            _harmony->write(xml);
 
       for (int i = 0; i < _strings; ++i) {
             FretItem::Marker m = marker(i);
@@ -507,11 +580,6 @@ void FretDiagram::write(XmlWriter& xml) const
 
             xml.tag(QString("barre start=\"%1\" end=\"%2\"").arg(b.startString).arg(b.endString), f);
             }
-
-      writeProperty(xml, Pid::MAG);
-      if (_harmony)
-            _harmony->write(xml);
-      xml.etag();
       }
 
 //---------------------------------------------------------
@@ -520,14 +588,81 @@ void FretDiagram::write(XmlWriter& xml) const
 
 void FretDiagram::read(XmlReader& e)
       {
-      int version = e.intAttribute("version", 1);
-      if (version == 1) {
-            read1(e);
-            return;
-            }
+      // Read the old format first
+      bool hasBarre = false;
+      bool haveReadNew = false;
 
       while (e.readNextStartElement()) {
             const QStringRef& tag(e.name());
+            qDebug() << "reading: " << tag;
+
+            if (haveReadNew) {
+                  qDebug("skipping");
+                  e.skipCurrentElement();
+                  continue;
+                  }
+            // Check for new format fret diagram
+            if (tag == "fretDiagram") {
+                  qDebug("read new");
+                  readNew(e);
+                  haveReadNew = true;               
+                  }
+            else if (tag == "strings")
+                  readProperty(e, Pid::FRET_STRINGS);
+            else if (tag == "frets")
+                  readProperty(e, Pid::FRET_FRETS);
+            else if (tag == "fretOffset")
+                  readProperty(e, Pid::FRET_OFFSET);
+            else if (tag == "string") {
+                  int no = e.intAttribute("no");
+                  while (e.readNextStartElement()) {
+                        const QStringRef& t(e.name());
+                        if (t == "dot")
+                              setDot(no, e.readInt());
+                        else if (t == "marker")
+                              setMarker(no, QChar(e.readInt()) == 'X' ? FretMarkerType::CROSS : FretMarkerType::CIRCLE);
+                        /*else if (t == "fingering")
+                              setFingering(no, e.readInt());*/
+                        else
+                              e.unknown();
+                        }
+                  }
+            else if (tag == "barre")
+                  hasBarre = e.readBool();
+            else if (tag == "mag")
+                  readProperty(e, Pid::MAG);
+            else if (tag == "Harmony") {
+                  Harmony* h = new Harmony(score());
+                  h->read(e);
+                  add(h);
+                  }
+            else if (!Element::readProperties(e))
+                  e.unknown();
+            }
+
+      // Old handling of barres
+      if (hasBarre) {
+            for (int s = 0; s < _strings; ++s) {
+                  for (auto& d : dot(s)) {
+                        if (d.exists()) {
+                              setBarre(s, d.fret);
+                              return;     // We can end here
+                              }
+                        }
+                  }
+            }
+      }
+
+//---------------------------------------------------------
+//   readNew
+//---------------------------------------------------------
+
+void FretDiagram::readNew(XmlReader& e)
+      {
+      while (e.readNextStartElement()) {
+            const QStringRef& tag(e.name());
+            qDebug() << "reading: " << tag;
+
             if (tag == "strings")
                   readProperty(e, Pid::FRET_STRINGS);
             else if (tag == "frets")
@@ -541,7 +676,6 @@ void FretDiagram::read(XmlReader& e)
                         if (t == "dot") {
                               int fret = e.intAttribute("fret", 0);
                               FretDotType dtype = FretItem::nameToDotType(e.readElementText());
-                              qDebug("read dot, %d:%d", no, fret);
                               setDot(no, fret, true, dtype);
                               }
                         else if (t == "marker") {
@@ -575,65 +709,6 @@ void FretDiagram::read(XmlReader& e)
             }
       }
 
-
-//---------------------------------------------------------
-//   read1
-//    This reads the old 301 fret diagram format, which is really incompatible
-//    with the current internal structure.
-//---------------------------------------------------------
-
-void FretDiagram::read1(XmlReader& e)
-      {
-      bool hasBarre = false;
-
-      while (e.readNextStartElement()) {
-            const QStringRef& tag(e.name());
-            if (tag == "strings")
-                  readProperty(e, Pid::FRET_STRINGS);
-            else if (tag == "frets")
-                  readProperty(e, Pid::FRET_FRETS);
-            else if (tag == "fretOffset")
-                  readProperty(e, Pid::FRET_OFFSET);
-            else if (tag == "string") {
-                  int no = e.intAttribute("no");
-                  while (e.readNextStartElement()) {
-                        const QStringRef& t(e.name());
-                        if (t == "dot")
-                              setDot(no, e.readInt());
-                        else if (t == "marker")
-                              setMarker(no, QChar(e.readInt()) == 'X' ? FretMarkerType::CROSS : FretMarkerType::CIRCLE);
-                        /*else if (t == "fingering")
-                              setFingering(no, e.readInt());*/
-                        else
-                              e.unknown();
-                        }
-                  }
-            else if (tag == "barre")
-                  hasBarre = e.readBool();
-            else if (tag == "mag")
-                  readProperty(e, Pid::MAG);
-            else if (tag == "Harmony") {
-                  Harmony* h = new Harmony(score());
-                  h->read(e);
-                  add(h);
-                  }
-            else if (!Element::readProperties(e))
-                  e.unknown();
-            }
-
-
-      if (hasBarre) {
-            for (int s = 0; s < _strings; ++s) {
-                  for (auto& d : dot(s)) {
-                        if (d.exists()) {
-                              setBarre(s, d.fret);
-                              return;     // We can end here
-                              }
-                        }
-                  }
-            }
-      }
-
 //---------------------------------------------------------
 //   setDot
 //    take a fret value of 0 to mean remove the dot, except with add
@@ -657,7 +732,6 @@ void FretDiagram::setDot(int string, int fret, bool add /*= false*/, FretDotType
                   _dots[string].clear();
 
             _dots[string].push_back(FretItem::Dot(fret, dtype));
-
             setMarker(string, FretMarkerType::NONE);
             }
       }

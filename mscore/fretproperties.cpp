@@ -108,7 +108,7 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
       double _spatium   = 20.0 * mag;
       double lw1        = _spatium * 0.08;
       int fretOffset    = diagram->fretOffset();
-      double lw2        = (fretOffset || !_showNut) ? lw1 : _spatium * 0.2;
+      double lw2        = (fretOffset || !diagram->showNut()) ? lw1 : _spatium * 0.2;
       double stringDist = _spatium * .7;
       double fretDist   = _spatium * .8;
       int _strings      = diagram->strings();

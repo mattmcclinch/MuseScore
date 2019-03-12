@@ -117,7 +117,7 @@
           <property name="minimumSize">
            <size>
             <width>1</width>
-            <height>1</height>
+            <height>20</height>
            </size>
           </property>
           <property name="accessibleName">
@@ -142,7 +142,7 @@
           <property name="minimumSize">
            <size>
             <width>1</width>
-            <height>1</height>
+            <height>20</height>
            </size>
           </property>
           <property name="accessibleName">
@@ -167,7 +167,7 @@
           <property name="minimumSize">
            <size>
             <width>1</width>
-            <height>1</height>
+            <height>20</height>
            </size>
           </property>
           <property name="accessibleName">
@@ -192,7 +192,7 @@
           <property name="minimumSize">
            <size>
             <width>1</width>
-            <height>1</height>
+            <height>20</height>
            </size>
           </property>
           <property name="toolTip">
@@ -223,7 +223,7 @@
           <property name="minimumSize">
            <size>
             <width>1</width>
-            <height>1</height>
+            <height>20</height>
            </size>
           </property>
           <property name="accessibleName">
@@ -248,7 +248,7 @@
           <property name="minimumSize">
            <size>
             <width>1</width>
-            <height>1</height>
+            <height>20</height>
            </size>
           </property>
           <property name="accessibleName">
