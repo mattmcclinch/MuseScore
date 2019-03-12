@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>183</width>
-    <height>459</height>
+    <width>220</width>
+    <height>494</height>
    </rect>
   </property>
   <property name="accessibleName">
@@ -73,12 +73,12 @@
    <item>
     <widget class="QWidget" name="panel" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>10</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0">
+     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0" columnstretch="1,0,0">
       <property name="leftMargin">
        <number>3</number>
       </property>
@@ -91,33 +91,196 @@
       <property name="verticalSpacing">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Scale:</string>
+         <string>Fret number:</string>
         </property>
         <property name="buddy">
-         <cstring>mag</cstring>
+         <cstring>fretNumber</cstring>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Strings:</string>
-        </property>
-        <property name="buddy">
-         <cstring>strings</cstring>
-        </property>
-       </widget>
+      <item row="2" column="2">
+       <widget class="Ms::ResetButton" name="resetStrings" native="true"/>
       </item>
-      <item row="0" column="2">
-       <widget class="Ms::ResetButton" name="resetMag" native="true"/>
+      <item row="8" column="0" colspan="3">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="5" column="1" colspan="2">
+         <widget class="QPushButton" name="toggleBarre">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+          <property name="accessibleName">
+           <string>Add a barre</string>
+          </property>
+          <property name="text">
+           <string>Barre</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QPushButton" name="squareSelect">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+          <property name="accessibleName">
+           <string>Use square symbol</string>
+          </property>
+          <property name="text">
+           <string>□</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="crossSelect">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+          <property name="accessibleName">
+           <string>Use cross symbol</string>
+          </property>
+          <property name="text">
+           <string>X</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="3" colspan="2">
+         <widget class="QPushButton" name="toggleMultidot">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Add multiple dots per string</string>
+          </property>
+          <property name="toolTipDuration">
+           <number>-1</number>
+          </property>
+          <property name="accessibleName">
+           <string>Add multiple dots per string</string>
+          </property>
+          <property name="text">
+           <string>Multidot</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QPushButton" name="triangleSelect">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+          <property name="accessibleName">
+           <string>Use triangle symbol</string>
+          </property>
+          <property name="text">
+           <string>△</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="circleSelect">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+          <property name="accessibleName">
+           <string>Use black dot symbol</string>
+          </property>
+          <property name="text">
+           <string>⚫</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item row="3" column="1">
        <widget class="QSpinBox" name="frets">
         <property name="accessibleName">
          <string>Frets</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="Ms::ResetButton" name="resetPlacement" native="true"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QSpinBox" name="fretNumber">
+        <property name="accessibleName">
+         <string>Fret number</string>
         </property>
         <property name="minimum">
          <number>1</number>
@@ -134,24 +297,18 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="Ms::ResetButton" name="resetPlacement" native="true"/>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Placement:</string>
+        </property>
+        <property name="buddy">
+         <cstring>placement</cstring>
+        </property>
+       </widget>
       </item>
       <item row="3" column="2">
        <widget class="Ms::ResetButton" name="resetFrets" native="true"/>
-      </item>
-      <item row="2" column="2">
-       <widget class="Ms::ResetButton" name="resetStrings" native="true"/>
-      </item>
-      <item row="5" column="1">
-       <widget class="QSpinBox" name="fretNumber">
-        <property name="accessibleName">
-         <string>Fret number</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="mag">
@@ -172,32 +329,8 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="placement">
-        <property name="accessibleName">
-         <string>Placement</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>Above</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Below</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Placement:</string>
-        </property>
-        <property name="buddy">
-         <cstring>placement</cstring>
-        </property>
-       </widget>
+      <item row="0" column="2">
+       <widget class="Ms::ResetButton" name="resetMag" native="true"/>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_4">
@@ -209,17 +342,10 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Fret number:</string>
-        </property>
-        <property name="buddy">
-         <cstring>fretNumber</cstring>
-        </property>
-       </widget>
+      <item row="5" column="2">
+       <widget class="Ms::ResetButton" name="resetFretNumber" native="true"/>
       </item>
-      <item row="7" column="0" colspan="3">
+      <item row="9" column="0" colspan="3">
        <widget class="Ms::FretCanvas" name="diagram">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -238,8 +364,59 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="2">
-       <widget class="Ms::ResetButton" name="resetFretNumber" native="true"/>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="placement">
+        <property name="accessibleName">
+         <string>Placement</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Above</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Below</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Scale:</string>
+        </property>
+        <property name="buddy">
+         <cstring>mag</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Strings:</string>
+        </property>
+        <property name="buddy">
+         <cstring>strings</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <widget class="QCheckBox" name="showNut">
+        <property name="accessibleName">
+         <string>Show nut</string>
+        </property>
+        <property name="text">
+         <string>Show nut</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2">
+       <widget class="Ms::ResetButton" name="resetShowNut" native="true">
+        <property name="accessibleName">
+         <string>Reset show nut</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

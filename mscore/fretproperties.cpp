@@ -108,7 +108,7 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
       double _spatium   = 20.0 * mag;
       double lw1        = _spatium * 0.08;
       int fretOffset    = diagram->fretOffset();
-      double lw2        = fretOffset ? lw1 : _spatium * 0.2;
+      double lw2        = (fretOffset || !_showNut) ? lw1 : _spatium * 0.2;
       double stringDist = _spatium * .7;
       double fretDist   = _spatium * .8;
       int _strings      = diagram->strings();
@@ -134,11 +134,15 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
       p.setPen(pen);
       p.setBrush(pen.color());
       double x2 = (_strings-1) * stringDist;
-      p.drawLine(QLineF(-lw1 * .5, 0.0, x2+lw1*.5, 0.0));
+      p.drawLine(QLineF(-lw1 * .5, 0.0, x2 + lw1 * .5, 0.0));
 
       pen.setWidthF(lw1);
       p.setPen(pen);
       double y2 = (_frets+1) * fretDist - fretDist*.5;
+
+      QPen symPen(pen);
+      symPen.setCapStyle(Qt::RoundCap);
+      symPen.setWidthF(lw1 * 1.2);
 
       // Draw strings and frets
       for (int i = 0; i < _strings; ++i) {
@@ -152,15 +156,15 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
 
       // Draw dots and markers
       for (int i = 0; i < _strings; ++i) {
-            p.setPen(Qt::NoPen);
-
             for (auto const& d : diagram->dot(i)) {
                   if (d.exists()) {
+                        p.setPen(symPen);
                         double dotd = stringDist * .6 + lw1;
                         int fret = d.fret;
                         double x = stringDist * i - dotd * .5;
                         double y = fretDist * (fret - 1) + fretDist * .5 - dotd * .5;
-                        p.drawEllipse(QRectF(x, y, dotd, dotd));
+
+                        paintDotSymbol(p, symPen, x, y, dotd, d.dtype);
                         }
                   }
             p.setPen(pen);
@@ -175,27 +179,8 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
                   }
             }
 
-      // Draw 'hover' dot - NOTE:JT may need to check logic in here
-      if ((cfret > 0) && (cfret <= _frets) && (cstring >= 0) && (cstring < _strings)) {
-            double dotd;
-
-            FretItem::Dot cd = diagram->dot(cstring, cfret)[0];
-            std::vector<FretItem::Dot> otherDots = diagram->dot(cstring);
-            if (cd.exists()) {
-                  p.setPen(Qt::NoPen);
-                  dotd = stringDist * .6 + lw1;
-                  }
-            else {
-                  p.setPen(pen);
-                  dotd = stringDist * .6;
-                  }
-            double x = stringDist * cstring - dotd * .5;
-            double y = fretDist * (cfret-1) + fretDist * .5 - dotd * .5;
-            p.setBrush(Qt::lightGray);
-            p.drawEllipse(QRectF(x, y, dotd, dotd));
-            }
-
       // Draw barres
+      p.setPen(pen);
       for (auto const& i : diagram->barres()) {            
             int fret        = i.first;
             int startString = i.second.startString;
@@ -209,6 +194,32 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
             pen.setCapStyle(Qt::RoundCap);
             p.setPen(pen);
             p.drawLine(QLineF(x1, y, newX2, y));
+            }
+
+      // Draw 'hover' dot
+      if ((cfret > 0) && (cfret <= _frets) && (cstring >= 0) && (cstring < _strings)) {
+            double dotd = stringDist * .6 + lw1;
+
+            FretItem::Dot cd = diagram->dot(cstring, cfret)[0];
+            std::vector<FretItem::Dot> otherDots = diagram->dot(cstring);
+            FretDotType dtype;
+            symPen.setColor(Qt::lightGray);
+            p.setPen(symPen);
+
+            if (cd.exists()) {
+                  dtype = cd.dtype;
+                  //p.setPen(Qt::NoPen);
+                  //dotd = stringDist * .6 + lw1;
+                  }
+            else {
+                  dtype = _automaticDotType ? FretDotType::NORMAL : _currentDtype;
+                  //p.setPen(pen);
+                  //dotd = stringDist * .6;
+                  }
+            double x = stringDist * cstring - dotd * .5;
+            double y = fretDist * (cfret-1) + fretDist * .5 - dotd * .5;
+            p.setBrush(Qt::lightGray);
+            paintDotSymbol(p, symPen, x, y, dotd, dtype);
             }
 
       if (fretOffset > 0) {
@@ -225,6 +236,35 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
             }
 
       QFrame::paintEvent(ev);
+      }
+
+//---------------------------------------------------------
+//   paintDotSymbol
+//---------------------------------------------------------
+
+void FretCanvas::paintDotSymbol(QPainter& p, QPen& pen, qreal x, qreal y, qreal dotd, FretDotType dtype)
+      {
+      switch (dtype) {
+            case FretDotType::CROSS:
+                  p.drawLine(QLineF(x, y, x + dotd, y + dotd));
+                  p.drawLine(QLineF(x + dotd, y, x, y + dotd));
+                  break;
+            case FretDotType::SQUARE:
+                  p.setBrush(Qt::NoBrush);
+                  p.drawRect(QRectF(x, y, dotd, dotd));
+                  break;
+            case FretDotType::TRIANGLE:
+                  p.drawLine(QLineF(x, y + dotd, x + .5 * dotd, y));
+                  p.drawLine(QLineF(x + .5 * dotd, y, x + dotd, y + dotd));
+                  p.drawLine(QLineF(x + dotd, y + dotd, x, y + dotd));                                    
+                  break;
+            case FretDotType::NORMAL:
+            default:
+                  p.setBrush(pen.color());
+                  p.setPen(Qt::NoPen);
+                  p.drawEllipse(QRectF(x, y, dotd, dotd));
+                  break;
+            }
       }
 
 //---------------------------------------------------------
@@ -285,20 +325,46 @@ void FretCanvas::mousePressEvent(QMouseEvent* ev)
       else {
             // Click on an existing dot
             FretItem::Dot thisDot = diagram->dot(string, fret)[0];
-            bool haveShift = ev->modifiers() & Qt::ShiftModifier;
-            bool haveCtrl  = ev->modifiers() & Qt::ControlModifier;
+            bool haveShift = (ev->modifiers() & Qt::ShiftModifier) || _barreMode;
+            bool haveCtrl  = (ev->modifiers() & Qt::ControlModifier) || _multidotMode;
 
-            if (thisDot.exists() && !haveShift) {
-                  // TODO: fix this with ctrl
-                  diagram->score()->undo(new FretDot(diagram, string, haveCtrl ? fret : 0));
-                  }
+            if (thisDot.exists() && !haveShift)
+                  diagram->score()->undo(new FretDot(diagram, string, haveCtrl ? fret : 0, haveCtrl));
             else {
                   if (haveShift)
                         diagram->score()->undo(new FretBarre(diagram, string, fret));
-                  if (haveCtrl)
-                        diagram->score()->undo(new FretDot(diagram, string, fret, true));
+
+                  FretDotType dtype = FretDotType::NORMAL;
+                  if (_automaticDotType && haveCtrl && diagram->dot(string)[0].exists()) {
+                        FretDotType currentDtype = FretDotType::NORMAL;
+                        for (auto const& d : diagram->dot(string)) {
+                              // Slightly hacky - this relies on the correct ordering of the
+                              // FretDotType enum
+                              if (d.dtype > currentDtype)
+                                    currentDtype = d.dtype;
+                              }
+
+                        switch (currentDtype) {
+                              case FretDotType::NORMAL:
+                                    dtype = FretDotType::CROSS;
+                                    break;
+                              case FretDotType::CROSS:
+                                    dtype = FretDotType::SQUARE;
+                                    break;
+                              case FretDotType::SQUARE:
+                              case FretDotType::TRIANGLE:
+                              default:
+                                    dtype = FretDotType::TRIANGLE; 
+                                    break;
+                              }
+                        }
+                  else if (!_automaticDotType)
+                        dtype = _currentDtype;
+
+                  if (haveCtrl) 
+                        diagram->score()->undo(new FretDot(diagram, string, fret, true, dtype));
                   else
-                        diagram->score()->undo(new FretDot(diagram, string, fret));
+                        diagram->score()->undo(new FretDot(diagram, string, fret, false, dtype));
                   }
             }
       diagram->triggerLayout();

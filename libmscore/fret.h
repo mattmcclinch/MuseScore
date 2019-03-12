@@ -21,8 +21,12 @@ class StringData;
 class Chord;
 class Harmony;
 
+// Keep this in order - used for comparisons
 enum class FretDotType : signed char {
-      NORMAL
+      NORMAL,
+      CROSS,
+      SQUARE,
+      TRIANGLE
       };
 
 enum class FretMarkerType : signed char {
@@ -101,6 +105,7 @@ class FretDiagram final : public Element {
       int _frets         { 4  };
       int _fretOffset    { 0  };
       int _maxFrets      { 24 };
+      bool _showNut      { true };
       
       // Barres are stored in the format: K: fret, V: barre struct
       BarreMap _barres;
@@ -162,9 +167,11 @@ class FretDiagram final : public Element {
       void setMarker(int string, FretMarkerType marker);
       void setFingering(int string, int finger);
       int  fretOffset() const     { return _fretOffset; }
-      void setFretOffset(int val);
+      void setFretOffset(int val) { _fretOffset = val;  }
       int  maxFrets() const       { return _maxFrets;   }
       void setMaxFrets(int val)   { _maxFrets = val;    }
+      bool showNut() const        { return _showNut;    }
+      void setShowNut(bool val)   { _showNut = val;     }
 
       std::vector<FretItem::Dot> dot(int s, int f = 0) const;
       FretItem::Marker marker(int s) const;

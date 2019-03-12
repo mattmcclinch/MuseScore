@@ -37,7 +37,7 @@ static const ElementStyle fretStyle {
       { Sid::fretStrings,                        Pid::FRET_STRINGS            },
       { Sid::fretFrets,                          Pid::FRET_FRETS              },
       { Sid::fretOffset,                         Pid::FRET_OFFSET             },
-      /*{ Sid::fretBarre,                          Pid::FRET_BARRE              },*/
+      { Sid::fretNut,                            Pid::FRET_NUT                },
       };
 
 //---------------------------------------------------------
@@ -66,6 +66,7 @@ FretDiagram::FretDiagram(const FretDiagram& f)
       _markers    = f._markers;
       _barres     = f._barres;
       _fingering  = f._fingering;
+      _showNut    = f._showNut;
 
       if (f._harmony)
             _harmony = new Harmony(*f._harmony);
@@ -236,11 +237,6 @@ void FretDiagram::setStrings(int n)
       _strings = n;
       }
 
-void FretDiagram::setFretOffset(int val)
-      {
-      _fretOffset = val;
-      }
-
 //---------------------------------------------------------
 //   init
 //---------------------------------------------------------
@@ -272,7 +268,7 @@ void FretDiagram::init(StringData* stringData, Chord* chord)
 
 void FretDiagram::draw(QPainter* painter) const
       {
-      qreal _spatium = spatium() * _userMag * score()->styleD(Sid::fretMag);
+      qreal _spatium = spatium() * _userMag;
       QPen pen(curColor());
       pen.setWidthF(lw2);
       pen.setCapStyle(Qt::FlatCap);
@@ -294,14 +290,19 @@ void FretDiagram::draw(QPainter* painter) const
             painter->drawLine(QLineF(0.0, y, x2, y));
             }
       QFont scaledFont(font);
-      scaledFont.setPointSizeF(font.pointSize() * _userMag * score()->styleD(Sid::fretMag) * (spatium() / SPATIUM20));
+      scaledFont.setPointSizeF(font.pointSize() * _userMag * (spatium() / SPATIUM20));
       QFontMetricsF fm(scaledFont, MScore::paintDevice());
       scaledFont.setPointSizeF(scaledFont.pointSizeF() * MScore::pixelRatio);
 
       painter->setFont(scaledFont);
-      qreal dotd = stringDist * .6;
+      qreal dotd = stringDist * .7;
 
       // Draw dots and markers
+      QPen symPen(pen);
+      symPen.setCapStyle(Qt::RoundCap);
+      qreal symPenWidth = lw1 * 1.2;
+      symPen.setWidthF(lw1 * 1.2);
+
       for (auto const& i : _dots) {
             for (auto const& d : i.second) {
                   if (!d.exists())
@@ -313,8 +314,33 @@ void FretDiagram::draw(QPainter* painter) const
                   qreal x = stringDist * string - dotd * .5;
                   qreal y = fretDist * fret + fretDist * .5 - dotd * .5;
 
-                  // TODO: draw different symbols
-                  painter->drawEllipse(QRectF(x, y, dotd, dotd));
+                  // Draw different symbols
+                  painter->setPen(symPen);
+                  switch (d.dtype) {
+                        case FretDotType::CROSS:
+                              // Give the cross a slightly larger width
+                              symPen.setWidthF(symPenWidth * 1.5);
+                              painter->setPen(symPen);
+                              painter->drawLine(QLineF(x, y, x + dotd, y + dotd));
+                              painter->drawLine(QLineF(x + dotd, y, x, y + dotd));
+                              symPen.setWidthF(symPenWidth);
+                              break;
+                        case FretDotType::SQUARE:
+                              painter->setBrush(Qt::NoBrush);
+                              painter->drawRect(QRectF(x, y, dotd, dotd));
+                              break;
+                        case FretDotType::TRIANGLE:
+                              painter->drawLine(QLineF(x, y + dotd, x + .5 * dotd, y));
+                              painter->drawLine(QLineF(x + .5 * dotd, y, x + dotd, y + dotd));
+                              painter->drawLine(QLineF(x + dotd, y + dotd, x, y + dotd));                                    
+                              break;
+                        case FretDotType::NORMAL:
+                        default:
+                              painter->setBrush(symPen.color());
+                              painter->setPen(Qt::NoPen);
+                              painter->drawEllipse(QRectF(x, y, dotd, dotd));
+                              break;
+                        }
                   }
             }
 
@@ -372,16 +398,16 @@ void FretDiagram::draw(QPainter* painter) const
 
 void FretDiagram::layout()
       {
-      qreal _spatium  = spatium() * _userMag * score()->styleD(Sid::fretMag);
+      qreal _spatium  = spatium() * _userMag;
       lw1             = _spatium * 0.08;
-      lw2             = _fretOffset ? lw1 : _spatium * 0.2;
+      lw2             = (_fretOffset || !_showNut) ? lw1 : _spatium * 0.2;
       stringDist      = _spatium * .7;
       fretDist        = _spatium * .8;
 
       qreal w    = stringDist * (_strings - 1);
       qreal h    = _frets * fretDist + fretDist * .5;
       qreal y    = 0.0;
-      qreal dotd = stringDist * .6;
+      qreal dotd = stringDist * .7;
       qreal x    = -((dotd+lw1) * .5);
       w         += dotd + lw1;
 
@@ -607,9 +633,11 @@ void FretDiagram::read1(XmlReader& e)
                   }
             }
       }
+
 //---------------------------------------------------------
 //   setDot
-//    take a fret value of 0 to mean remove the dot
+//    take a fret value of 0 to mean remove the dot, except with add
+//    where we actually need to pass a fret val.
 //---------------------------------------------------------
 
 void FretDiagram::setDot(int string, int fret, bool add /*= false*/, FretDotType dtype /*= FretDotType::NORMAL*/)
@@ -617,10 +645,18 @@ void FretDiagram::setDot(int string, int fret, bool add /*= false*/, FretDotType
       if (fret == 0)
             removeDot(string, fret);
       else if (string >= 0 && string < _strings) {
-            if (!add)
+            // Special case - with add, if there is a dot in the position, remove it
+            // If not, add it.
+            if (add) {
+                  if (dot(string, fret)[0].exists()) {
+                        removeDot(string, fret);
+                        return;     // We are done here, all we needed to do was remove a single dot
+                        }
+                  }
+            else
                   _dots[string].clear();
 
-            _dots[string].push_back(FretItem::Dot(fret));
+            _dots[string].push_back(FretItem::Dot(fret, dtype));
 
             setMarker(string, FretMarkerType::NONE);
             }
@@ -767,6 +803,11 @@ void FretDiagram::removeDot(int s, int f /*= 0*/)
             }
       else
             _dots[s].clear();
+
+      if (_dots[s].size() == 0) {
+            auto it = _dots.find(s);
+            _dots.erase(it);
+            }
       }
 
 //---------------------------------------------------------
@@ -806,7 +847,7 @@ std::vector<FretItem::Dot> FretDiagram::dot(int s, int f /*= 0*/) const
             else
                   return _dots.at(s);
             }
-      return std::vector<FretItem::Dot> {FretItem::Dot(0)};
+      return std::vector<FretItem::Dot> { FretItem::Dot(0) };
       }
 
 //---------------------------------------------------------
@@ -958,8 +999,8 @@ QVariant FretDiagram::getProperty(Pid propertyId) const
                   return strings();
             case Pid::FRET_FRETS:
                   return frets();
-            /*case Pid::FRET_BARRE:
-                  return barre();*/
+            case Pid::FRET_NUT:
+                  return showNut();
             case Pid::FRET_OFFSET:
                   return fretOffset();
             case Pid::FRET_NUM_POS:
@@ -985,9 +1026,9 @@ bool FretDiagram::setProperty(Pid propertyId, const QVariant& v)
             case Pid::FRET_FRETS:
                   setFrets(v.toInt());
                   break;
-            /*case Pid::FRET_BARRE:
-                  setBarre(v.toInt());
-                  break;*/
+            case Pid::FRET_NUT:
+                  setShowNut(v.toBool());
+                  break;
             case Pid::FRET_OFFSET:
                   setFretOffset(v.toInt());
                   break;
@@ -1074,7 +1115,10 @@ FretMarkerType FretItem::nameToMarkerType(QString n)
 //---------------------------------------------------------
 
 const std::vector<FretItem::DotTypeNameItem> FretItem::dotTypeNameMap = {
-      { FretDotType::NORMAL,        "normal"    }
+      { FretDotType::NORMAL,        "normal"    },
+      { FretDotType::CROSS,         "cross"     },
+      { FretDotType::SQUARE,        "square"    },
+      { FretDotType::TRIANGLE,      "triangle"  },
       };
 
 QString FretItem::dotTypeToName(FretDotType t)
