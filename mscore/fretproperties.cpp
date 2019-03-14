@@ -204,18 +204,16 @@ void FretCanvas::paintEvent(QPaintEvent* ev)
             std::vector<FretItem::Dot> otherDots = diagram->dot(cstring);
             FretDotType dtype;
             symPen.setColor(Qt::lightGray);
-            p.setPen(symPen);
 
             if (cd.exists()) {
                   dtype = cd.dtype;
-                  //p.setPen(Qt::NoPen);
-                  //dotd = stringDist * .6 + lw1;
+                  symPen.setColor(Qt::red);
                   }
             else {
                   dtype = _automaticDotType ? FretDotType::NORMAL : _currentDtype;
-                  //p.setPen(pen);
-                  //dotd = stringDist * .6;
                   }
+            p.setPen(symPen);
+
             double x = stringDist * cstring - dotd * .5;
             double y = fretDist * (cfret-1) + fretDist * .5 - dotd * .5;
             p.setBrush(Qt::lightGray);
@@ -309,30 +307,31 @@ void FretCanvas::mousePressEvent(QMouseEvent* ev)
       if (fret == 0) {
             switch (diagram->marker(string).mtype) {
                   case FretMarkerType::CIRCLE:
-                        diagram->score()->undo(new FretMarker(diagram, string, FretMarkerType::CROSS));
+                        diagram->undoSetFretMarker(string, FretMarkerType::CROSS);
                         break;
                   case FretMarkerType::CROSS:
-                        diagram->score()->undo(new FretMarker(diagram, string, FretMarkerType::NONE));
+                        diagram->undoSetFretMarker(string, FretMarkerType::NONE);
                         break;
                   case FretMarkerType::NONE:
                   default:
-                        diagram->score()->undo(new FretDot(diagram, string, 0));
-                        diagram->score()->undo(new FretMarker(diagram, string, FretMarkerType::CIRCLE));
+                        diagram->undoSetFretDot(string, 0);
+                        diagram->undoSetFretMarker(string, FretMarkerType::CIRCLE);
                         break;
                   }
             }
       // Otherwise, the click is on the fretboard itself
       else {
-            // Click on an existing dot
             FretItem::Dot thisDot = diagram->dot(string, fret)[0];
             bool haveShift = (ev->modifiers() & Qt::ShiftModifier) || _barreMode;
             bool haveCtrl  = (ev->modifiers() & Qt::ControlModifier) || _multidotMode;
 
+            // Click on an existing dot
             if (thisDot.exists() && !haveShift)
-                  diagram->score()->undo(new FretDot(diagram, string, haveCtrl ? fret : 0, haveCtrl));
+                  diagram->undoSetFretDot(string, haveCtrl ? fret : 0, haveCtrl);
             else {
+                  // Shift adds a barre
                   if (haveShift)
-                        diagram->score()->undo(new FretBarre(diagram, string, fret));
+                        diagram->undoSetFretBarre(string, fret);
 
                   FretDotType dtype = FretDotType::NORMAL;
                   if (_automaticDotType && haveCtrl && diagram->dot(string)[0].exists()) {
@@ -340,7 +339,7 @@ void FretCanvas::mousePressEvent(QMouseEvent* ev)
                         for (auto const& d : diagram->dot(string)) {
                               // Slightly hacky - this relies on the correct ordering of the
                               // FretDotType enum
-                              if (d.dtype > currentDtype)
+                              if (d.exists() && d.dtype > currentDtype)
                                     currentDtype = d.dtype;
                               }
 
@@ -361,10 +360,11 @@ void FretCanvas::mousePressEvent(QMouseEvent* ev)
                   else if (!_automaticDotType)
                         dtype = _currentDtype;
 
+                  // Ctrl adds a dot without removing other dots on a string
                   if (haveCtrl) 
-                        diagram->score()->undo(new FretDot(diagram, string, fret, true, dtype));
+                        diagram->undoSetFretDot(string, fret, true, dtype);
                   else
-                        diagram->score()->undo(new FretDot(diagram, string, fret, false, dtype));
+                        diagram->undoSetFretDot(string, fret, false, dtype);
                   }
             }
       diagram->triggerLayout();

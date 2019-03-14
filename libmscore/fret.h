@@ -29,11 +29,13 @@ enum class FretDotType : signed char {
       TRIANGLE
       };
 
+
 enum class FretMarkerType : signed char {
       NONE,
       CIRCLE,
       CROSS
       };
+
 
 class FretItem {
    public:
@@ -84,9 +86,27 @@ class FretItem {
       static FretDotType nameToDotType(QString n);
       };
 
+
+// The three main storage containers used by fret diagrams
 typedef std::map<int, FretItem::Barre> BarreMap;
 typedef std::map<int, FretItem::Marker> MarkerMap;
 typedef std::map<int, std::vector<FretItem::Dot>> DotMap;
+
+
+class FretUndoData {
+      FretDiagram* _diagram         { nullptr };
+      BarreMap _barres;
+      MarkerMap _markers;
+      DotMap _dots;
+      bool _init   { false };
+
+   public:
+      FretUndoData() {}
+      FretUndoData(FretDiagram* fd) : _diagram(fd) {}
+
+      void updateStored();
+      void updateDiagram();
+      };
 
 //---------------------------------------------------------
 //   @@ FretDiagram
@@ -132,6 +152,11 @@ class FretDiagram final : public Element {
       void removeMarker(int s);
       void removeDotsMarkers(int ss, int es, int fret);
 
+      // Used by FretUndoData which is a friend
+      void setBarres(BarreMap barres)     { _barres = barres; }
+      void setDots(DotMap dots)           { _dots = dots; }
+      void setMarkers(MarkerMap markers)  { _markers = markers; }
+
    public:
       FretDiagram(Score* s);
       FretDiagram(const FretDiagram&);
@@ -166,6 +191,10 @@ class FretDiagram final : public Element {
       void setBarre(int string, int fret);
       void setMarker(int string, FretMarkerType marker);
       void setFingering(int string, int finger);
+      void clear();
+      void undoSetFretDot(int _string, int _fret, bool _add = false, FretDotType _dtype = FretDotType::NORMAL);
+      void undoSetFretMarker(int _string, FretMarkerType _mtype);
+      void undoSetFretBarre(int _string, int _fret);
       int  fretOffset() const     { return _fretOffset; }
       void setFretOffset(int val) { _fretOffset = val;  }
       int  maxFrets() const       { return _maxFrets;   }
@@ -179,12 +208,6 @@ class FretDiagram final : public Element {
 #if 0 // NOTE:JT possible future feature
       int fingering(int s) const       { return _fingering ? _fingering[s] : 0; }
 #endif
-
-      // WARNING: The following functions are dangerous, only use in undo functions
-      void setBarres(BarreMap barres)     { _barres = barres; }
-      void setDots(DotMap dots)           { _dots = dots; }
-      void setMarkers(MarkerMap markers)  { _markers = markers; }
-      // end dangerous functions
 
       BarreMap barres() const             { return _barres; }
       DotMap dots() const                 { return _dots; }
@@ -208,6 +231,8 @@ class FretDiagram final : public Element {
 
       qreal userMag() const         { return _userMag;   }
       void setUserMag(qreal m)      { _userMag = m;      }
+
+      friend class FretUndoData;
       };
 
 

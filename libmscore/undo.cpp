@@ -2367,24 +2367,17 @@ void ChangeGap::flip(EditData*)
 
 void FretDot::redo(EditData*)
       {
-      // We need to store the old barres and markers, since adding dots can
-      // remove barres and markers that are in the way.
-      barres = diagram->barres();
-      markers = diagram->markers();
-      dots = diagram->dots();
+      undoData = FretUndoData(diagram);
+      undoData.updateStored();
 
       diagram->setDot(string, fret, add, dtype);
-
       diagram->triggerLayout();
       }
 
 
 void FretDot::undo(EditData*)
       {
-      diagram->setBarres(barres);
-      diagram->setMarkers(markers);
-      diagram->setDots(dots);
-
+      undoData.updateDiagram();
       diagram->triggerLayout();
       }
 
@@ -2394,27 +2387,16 @@ void FretDot::undo(EditData*)
 
 void FretMarker::redo(EditData*)
       {
-      barres = diagram->barres();
-      dots = diagram->dots();
-      
-      FretMarkerType oldMarker = diagram->marker(string).mtype;
+      undoData = FretUndoData(diagram);
+      undoData.updateStored();
 
       diagram->setMarker(string, mtype);
-
-      mtype = oldMarker;
       diagram->triggerLayout();
       }
 
 void FretMarker::undo(EditData*)
-      {      
-      FretMarkerType oldMarker = diagram->marker(string).mtype;
-
-      diagram->setMarker(string, mtype);
-
-      diagram->setBarres(barres);
-      diagram->setDots(dots);
-
-      mtype = oldMarker;
+      {
+      undoData.updateDiagram();
       diagram->triggerLayout();
       }
 
@@ -2424,9 +2406,8 @@ void FretMarker::undo(EditData*)
 
 void FretBarre::redo(EditData*)
       {
-      barres = diagram->barres();
-      dots = diagram->dots();
-      markers = diagram->markers();
+      undoData = FretUndoData(diagram);
+      undoData.updateStored();
 
       diagram->setBarre(string, fret);
       diagram->triggerLayout();
@@ -2434,10 +2415,7 @@ void FretBarre::redo(EditData*)
 
 void FretBarre::undo(EditData*)
       {
-      diagram->setBarres(barres);
-      diagram->setDots(dots);
-      diagram->setMarkers(markers);
-
+      undoData.updateDiagram();
       diagram->triggerLayout();
       }
 

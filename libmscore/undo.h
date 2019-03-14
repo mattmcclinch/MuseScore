@@ -1312,9 +1312,7 @@ class FretDot : public UndoCommand {
       int fret;
       bool add;
       FretDotType dtype;
-      BarreMap barres;
-      MarkerMap markers;
-      DotMap dots;
+      FretUndoData undoData;
 
       void redo(EditData*) override;
       void undo(EditData*) override;
@@ -1333,8 +1331,7 @@ class FretMarker : public UndoCommand {
       FretDiagram* diagram;
       int string;
       FretMarkerType mtype;
-      BarreMap barres;
-      DotMap dots;
+      FretUndoData undoData;
 
       void redo(EditData*) override;
       void undo(EditData*) override;
@@ -1352,9 +1349,7 @@ class FretBarre : public UndoCommand {
       FretDiagram* diagram;
       int string;
       int fret;
-      MarkerMap markers;
-      DotMap dots;
-      BarreMap barres;
+      FretUndoData undoData;
 
       void redo(EditData*) override;
       void undo(EditData*) override;

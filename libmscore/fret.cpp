@@ -20,6 +20,7 @@
 #include "segment.h"
 #include "mscore.h"
 #include "harmony.h"
+#include "undo.h"
 
 namespace Ms {
 
@@ -476,6 +477,17 @@ void FretDiagram::write(XmlWriter& xml) const
             return;
       xml.stag(this);
 
+      // Write properties first and only once
+      Element::writeProperties(xml);
+      writeProperty(xml, Pid::FRET_STRINGS);
+      writeProperty(xml, Pid::FRET_FRETS);
+      writeProperty(xml, Pid::FRET_OFFSET);
+      writeProperty(xml, Pid::FRET_NUT);
+      writeProperty(xml, Pid::MAG);
+
+      if (_harmony)
+            _harmony->write(xml);
+
       // Lowercase f indicates new writing format
       // TODO: in the next score format version (4) use only write new and discard
       // the compatability writing.
@@ -495,14 +507,6 @@ void FretDiagram::write(XmlWriter& xml) const
 
 void FretDiagram::writeOld(XmlWriter& xml) const
       {
-      Element::writeProperties(xml);
-      writeProperty(xml, Pid::FRET_STRINGS);
-      writeProperty(xml, Pid::FRET_FRETS);
-      writeProperty(xml, Pid::FRET_OFFSET);
-      writeProperty(xml, Pid::MAG);
-      if (_harmony)
-            _harmony->write(xml);
-
       int lowestDotFret = -1;
       bool multipleDotsOnFret = false;
       for (int i = 0; i < _strings; ++i) {
@@ -538,7 +542,7 @@ void FretDiagram::writeOld(XmlWriter& xml) const
             xml.etag();
             }
 
-      // The old system writes a barre as a bool, which causes no problems in anyway, not at all.
+      // The old system writes a barre as a bool, which causes no problems in any way, not at all.
       // So, only write that if the barre is on the lowest fret with a dot,
       // and there are no other dots on its fret, and it goes all the way to the right.
       for (auto const& i : _barres) {
@@ -560,16 +564,6 @@ void FretDiagram::writeOld(XmlWriter& xml) const
 
 void FretDiagram::writeNew(XmlWriter& xml) const
       {
-      Element::writeProperties(xml);
-
-      writeProperty(xml, Pid::FRET_STRINGS);
-      writeProperty(xml, Pid::FRET_FRETS);
-      writeProperty(xml, Pid::FRET_OFFSET);
-      writeProperty(xml, Pid::FRET_NUT);
-      writeProperty(xml, Pid::MAG);
-      if (_harmony)
-            _harmony->write(xml);
-
       for (int i = 0; i < _strings; ++i) {
             FretItem::Marker m = marker(i);
             std::vector<FretItem::Dot> allDots = dot(i);
@@ -633,7 +627,7 @@ void FretDiagram::read(XmlReader& e)
                   }
             if (tag == "fretDiagram") {
                   readNew(e);
-                  haveReadNew = true;               
+                  haveReadNew = true;       
                   }
 
             // Then read the rest if there is no new format diagram (compatability read)
@@ -676,7 +670,7 @@ void FretDiagram::read(XmlReader& e)
                   for (auto& d : dot(s)) {
                         if (d.exists()) {
                               setBarre(s, d.fret);
-                              return;     // We can end here
+                              return;
                               }
                         }
                   }
@@ -777,11 +771,7 @@ void FretDiagram::setMarker(int string, FretMarkerType mtype)
       if (string >= 0 && string < _strings) {
             _markers[string] = FretItem::Marker(mtype);
             if (mtype != FretMarkerType::NONE) {
-                  for (auto const& d : dot(string)) {
-                        if (d.exists())
-                              removeDot(string);
-                        }
-
+                  removeDot(string);
                   removeBarres(string);
                   }
             }
@@ -846,6 +836,42 @@ void FretDiagram::setBarre(int string, int fret)
       }
 
 //---------------------------------------------------------
+//   undoSetFretDot
+//---------------------------------------------------------
+
+void FretDiagram::undoSetFretDot(int _string, int _fret, bool _add /*= true*/, FretDotType _dtype /*= FretDotType::NORMAl*/)
+      {
+      for (ScoreElement* e : linkList()) {
+            FretDiagram* fd = toFretDiagram(e);
+            fd->score()->undo(new FretDot(fd, _string, _fret, _add, _dtype));
+            }
+      }
+
+//---------------------------------------------------------
+//   undoSetFretMarker
+//---------------------------------------------------------
+
+void FretDiagram::undoSetFretMarker(int _string, FretMarkerType _mtype)
+      {
+      for (ScoreElement* e : linkList()) {
+            FretDiagram* fd = toFretDiagram(e);
+            fd->score()->undo(new FretMarker(fd, _string, _mtype));
+            }
+      }
+
+//---------------------------------------------------------
+//   undoSetFretBarre
+//---------------------------------------------------------
+
+void FretDiagram::undoSetFretBarre(int _string, int _fret)
+      {
+      for (ScoreElement* e : linkList()) {
+            FretDiagram* fd = toFretDiagram(e);
+            fd->score()->undo(new FretBarre(fd, _string, _fret));
+            }
+      }
+
+//---------------------------------------------------------
 //   removeBarre
 //    Remove a barre on a given fret.
 //---------------------------------------------------------
@@ -900,7 +926,7 @@ void FretDiagram::removeDot(int s, int f /*= 0*/)
       if (f > 0) {
             std::vector<FretItem::Dot> tempDots;
             for (auto const& d : dot(s)) {
-                  if (d.fret != f)
+                  if (d.exists() && d.fret != f)
                         tempDots.push_back(FretItem::Dot(d));
                   }
 
@@ -936,6 +962,17 @@ void FretDiagram::removeDotsMarkers(int ss, int es, int fret)
       }
 
 //---------------------------------------------------------
+//   clear
+//---------------------------------------------------------
+
+void FretDiagram::clear()
+      {
+      _barres.clear();
+      _dots.clear();
+      _markers.clear();
+      }
+
+//---------------------------------------------------------
 //   dot
 //    take fret value of zero to mean all dots 
 //---------------------------------------------------------
@@ -946,7 +983,7 @@ std::vector<FretItem::Dot> FretDiagram::dot(int s, int f /*= 0*/) const
             if (f != 0) {
                   for (auto const& d : _dots.at(s)) {
                         if (d.fret == f)
-                              return std::vector<FretItem::Dot> {FretItem::Dot(d)};
+                              return std::vector<FretItem::Dot> { FretItem::Dot(d) };
                         }
                   }
             else
@@ -1284,6 +1321,45 @@ FretDotType FretItem::nameToDotType(QString n)
             }
       qWarning("Unrecognised dot name!");
       return FretDotType::NORMAL;       // default
+      }
+
+//---------------------------------------------------------
+//   updateStored
+//---------------------------------------------------------
+
+void FretUndoData::updateStored()
+      {
+      // We need to store the old barres and markers, since predicting how
+      // adding dots, markers, barres etc. will change things is too difficult.
+      // Update linked fret diagrams:
+      if (!_diagram) {
+            qFatal("Fret diagram undo: diagram not set!");
+            return;
+            }
+
+      _dots = _diagram->dots();
+      _markers = _diagram->markers();
+      _barres = _diagram->barres();
+
+      _init = true;
+      }
+
+//---------------------------------------------------------
+//   updateDiagram
+//---------------------------------------------------------
+
+void FretUndoData::updateDiagram()
+      {
+      if (!_init) {
+            qFatal("Tried to undo fret diagram change without ever setting initial values!");
+            return;
+            }
+
+      // Reset every fret diagram linked to the changed diagram
+      // FretUndoData is a friend of FretDiagram so has access to these private functions.
+      _diagram->setBarres(_barres);
+      _diagram->setMarkers(_markers);
+      _diagram->setDots(_dots);
       }
 
 }
