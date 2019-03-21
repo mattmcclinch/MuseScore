@@ -20,8 +20,15 @@
 #include "cocoabridge.h"
 #import <Cocoa/Cocoa.h>
 
-void  CocoaBridge::setAllowsAutomaticWindowTabbing(bool flag)
-{
-    if ([NSWindow respondsToSelector:@selector(allowsAutomaticWindowTabbing)])
-        [NSWindow setAllowsAutomaticWindowTabbing: flag];
-}
+void CocoaBridge::setAllowsAutomaticWindowTabbing(bool flag)
+      {
+      if ([NSWindow respondsToSelector:@selector(allowsAutomaticWindowTabbing)])
+            [NSWindow setAllowsAutomaticWindowTabbing: flag];
+      }
+
+void CocoaBridge::setAutomaticCustomizeTouchBarMenuItemEnabled(bool flag)
+      {
+      NSApplication* application = [NSApplication sharedApplication];
+      if ([application respondsToSelector:@selector(setAutomaticCustomizeTouchBarMenuItemEnabled:)])
+            [application setAutomaticCustomizeTouchBarMenuItemEnabled:flag];
+      }

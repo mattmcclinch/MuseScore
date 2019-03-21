@@ -285,7 +285,7 @@ endif (OMR)
 
 if (APPLE)
       file(GLOB_RECURSE INCS "*.h")
-      set(COCOABRIDGE "macos/cocoabridge.mm")
+      set(COCOABRIDGE macos/cocoabridge.mm macos/touchbar.mm)
       if (SPARKLE_FOUND)
             set(MAC_SPARKLE_FILES "macos/SparkleAutoUpdater.mm")
       endif(SPARKLE_FOUND)

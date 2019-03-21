@@ -2,7 +2,7 @@
 //  MuseScore
 //  Music Composition & Notation
 //
-//  Copyright (C) 2008-2018 Werner Schweer and others
+//  Copyright (C) 2008-2019 Werner Schweer and others
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License version 2.
@@ -17,13 +17,17 @@
 //  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //=============================================================================
 
-#ifndef __COCOABRIDGE_H__
-#define __COCOABRIDGE_H__
+#ifndef __TOUCHBAR_H__
+#define __TOUCHBAR_H__
 
-class CocoaBridge {
+class TouchBar {
+      QString _identifierPrefix;
+      void* _provider;
    public:
-      static void setAllowsAutomaticWindowTabbing(bool flag);
-      static void setAutomaticCustomizeTouchBarMenuItemEnabled(bool flag);
+      TouchBar(QString identifierPrefix, QString name);
+      void addButton(QString name, QAction* a, QString description);
+      void setAsTouchBarForWidget(QWidget* widget);
+      void setAsTouchBarForApplication();
       };
 
 #endif

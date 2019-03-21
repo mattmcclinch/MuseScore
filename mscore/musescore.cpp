@@ -135,6 +135,7 @@
 #endif
 #ifdef Q_OS_MAC
 #include "macos/cocoabridge.h"
+#include "macos/touchbar.h"
 #endif
 
 #ifdef AEOLUS
@@ -7597,6 +7598,18 @@ int main(int argc, char* av[])
 
       // don't let macOS add "Show Tab Bar" to "View" Menu
       CocoaBridge::setAllowsAutomaticWindowTabbing(false);
+
+      TouchBar touchBar = TouchBar("org.musescore.MuseScore.","MainWindow");
+
+      for (const char* s : { "toggle-palette", "inspector" }) {
+            Shortcut* sc = Shortcut::getShortcut(s);
+            touchBar.addButton(sc->key(), sc->action(), sc->descr());
+            }
+
+      touchBar.setAsTouchBarForWidget(mscore);
+
+      // let macOS add "Customize Touch Bar..." to "MuseScore" menu
+      CocoaBridge::setAutomaticCustomizeTouchBarMenuItemEnabled(true);
 #endif
 
       mscore->changeState(mscore->noScore() ? STATE_DISABLED : STATE_NORMAL);
