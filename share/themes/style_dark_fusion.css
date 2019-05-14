@@ -41,5 +41,8 @@ QToolButton[voice4="true"]:checked, QToolButton[voice4="true"]:pressed { color: 
 /* Toolbar voice selector */
 QToolButton#voice:checked, QToolButton#voice:pressed { color: white; }
 
+/* Concert pitch button */
+QToolButton#concert-pitch:checked { color: rgb(120, 175, 230); }
+
 /* Mainly in midi import */
 QTableView { border: none; }

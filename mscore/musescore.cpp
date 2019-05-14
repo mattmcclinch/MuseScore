@@ -1213,7 +1213,9 @@ MuseScore::MuseScore()
       cpitchTools->setObjectName("pitch-tools");
       a = getAction("concert-pitch");
       a->setCheckable(true);
-      cpitchTools->addWidget(new AccessibleToolButton(cpitchTools, a));
+      AccessibleToolButton* cpitchButton = new AccessibleToolButton(cpitchTools, a);
+      cpitchButton->setObjectName("concert-pitch");
+      cpitchTools->addWidget(cpitchButton);
 
       //-------------------------------
       //    Image Capture Tool Bar
