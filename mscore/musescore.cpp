@@ -3932,7 +3932,7 @@ void MuseScore::checkForUpdatesNoUI()
       if (autoUpdater)
             autoUpdater->checkUpdates();
       else if (ucheck)
-            ucheck->check(version(), sender() != 0);
+            ucheck->check(version(), false);
       }
 
 //---------------------------------------------------------
@@ -3944,7 +3944,7 @@ void MuseScore::checkForUpdatesUI()
       if (autoUpdater)
             autoUpdater->checkForUpdatesNow();
       else if (ucheck)
-            ucheck->check(version(), sender() != 0);
+            ucheck->check(version(), true);
       }
 
 //---------------------------------------------------------
