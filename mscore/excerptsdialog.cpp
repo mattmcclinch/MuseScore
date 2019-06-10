@@ -303,6 +303,9 @@ void ExcerptsDialog::removeButtonClicked()
 
       Excerpt* cur = ((ExcerptItem*)(excerptList->currentItem()))->excerpt();
       QTreeWidgetItem* item = wi.first();
+      if (item->parent())
+            // the selected item represents a staff; let's remove the whole instrument
+            item = item->parent();
 
       cur->parts().removeAt(partList->indexOfTopLevelItem(item));
       delete item;
