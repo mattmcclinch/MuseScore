@@ -143,11 +143,13 @@ void ScoreView::setViewRect(const QRectF& r)
 //    return true if there is a valid target
 //---------------------------------------------------------
 
-bool ScoreView::dragTimeAnchorElement(const QPointF& pos)
+bool ScoreView::dragTimeAnchorElement(const QPointF& pos, bool firstStaffOnly)
       {
       int staffIdx;
       Segment* seg;
       MeasureBase* mb = _score->pos2measure(pos, &staffIdx, 0, &seg, 0);
+      if (firstStaffOnly)
+            staffIdx = 0;
       int track  = staffIdx * VOICES;
 
       if (mb && mb->isMeasure() && seg->element(track)) {
@@ -334,6 +336,8 @@ void ScoreView::dragMoveEvent(QDragMoveEvent* event)
 
       switch (editData.dropElement->type()) {
             case ElementType::VOLTA:
+                  event->setAccepted(dragTimeAnchorElement(pos, !(editData.modifiers & Qt::ControlModifier)));
+                  break;
             case ElementType::PEDAL:
             case ElementType::LET_RING:
             case ElementType::VIBRATO:
@@ -430,7 +434,21 @@ void ScoreView::dropEvent(QDropEvent* event)
                   case ElementType::TEXTLINE:
                         {
                         Spanner* spanner = static_cast<Spanner*>(editData.dropElement);
-                        score()->cmdAddSpanner(spanner, pos);
+
+                        // voltas drop to first staff by default, or closest staff if Control is held
+                        if (editData.dropElement->type() == ElementType::VOLTA) {
+                              int staffIdx = 0;
+                              Measure* m = _score->pos2measure(pos, &staffIdx, 0, 0, 0);
+                              if (!m) {
+                                    qDebug("drop %s doesn't have a valid measure to drop to", editData.dropElement->name());
+                                    break;
+                                    }
+                              staffIdx = (editData.modifiers & Qt::ControlModifier) ? staffIdx : 0;
+                              score()->cmdAddSpanner(spanner, staffIdx, m->first(), m->last());
+                              }
+                        else
+                              score()->cmdAddSpanner(spanner, pos);
+
                         score()->setUpdateAll();
                         event->acceptProposedAction();
                         }
