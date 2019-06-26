@@ -416,6 +416,7 @@ void ScoreView::dropEvent(QDropEvent* event)
       editData.modifiers = event->keyboardModifiers();
 
       if (editData.dropElement) {
+            bool firstStaffOnly = false;
             bool applyUserOffset = false;
             bool triggerSpannerDropApplyTour = editData.dropElement->isSpanner();
             editData.dropElement->styleChanged();
@@ -424,6 +425,9 @@ void ScoreView::dropEvent(QDropEvent* event)
             _score->addRefresh(editData.dropElement->canvasBoundingRect());
             switch (editData.dropElement->type()) {
                   case ElementType::VOLTA:
+                        // voltas drop to first staff by default, or closest staff if Control is held
+                        firstStaffOnly = !(editData.modifiers & Qt::ControlModifier);
+                        // fall-thru
                   case ElementType::OTTAVA:
                   case ElementType::TRILL:
                   case ElementType::PEDAL:
@@ -434,21 +438,7 @@ void ScoreView::dropEvent(QDropEvent* event)
                   case ElementType::TEXTLINE:
                         {
                         Spanner* spanner = static_cast<Spanner*>(editData.dropElement);
-
-                        // voltas drop to first staff by default, or closest staff if Control is held
-                        if (editData.dropElement->type() == ElementType::VOLTA) {
-                              int staffIdx = 0;
-                              Measure* m = _score->pos2measure(pos, &staffIdx, 0, 0, 0);
-                              if (!m) {
-                                    qDebug("drop %s doesn't have a valid measure to drop to", editData.dropElement->name());
-                                    break;
-                                    }
-                              staffIdx = (editData.modifiers & Qt::ControlModifier) ? staffIdx : 0;
-                              score()->cmdAddSpanner(spanner, staffIdx, m->first(), m->last());
-                              }
-                        else
-                              score()->cmdAddSpanner(spanner, pos);
-
+                        score()->cmdAddSpanner(spanner, pos, firstStaffOnly);
                         score()->setUpdateAll();
                         event->acceptProposedAction();
                         }
