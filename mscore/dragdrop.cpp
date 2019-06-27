@@ -172,15 +172,21 @@ bool ScoreView::dragTimeAnchorElement(const QPointF& pos)
 
 bool ScoreView::dragMeasureAnchorElement(const QPointF& pos)
       {
-      Measure* m = _score->searchMeasure(pos);
-      if (m) {
+      //Measure* m = _score->searchMeasure(pos);
+      int staffIdx = 0;
+      Segment* seg;
+      MeasureBase* mb = _score->pos2measure(pos, &staffIdx, 0, &seg, 0);
+      bool firstStaffOnly = !(editData.modifiers & Qt::ControlModifier);
+      if (mb && mb->isMeasure()) {
+            Measure* m = toMeasure(mb);
+            System* s  = m->system();
             QRectF b(m->canvasBoundingRect());
 
             QPointF anchor;
-            if (pos.x() < (b.x() + b.width() * .5) || m == _score->lastMeasureMM())
-                  anchor = m->canvasBoundingRect().topLeft();
-            else
-                  anchor = m->canvasBoundingRect().topRight();
+            if (pos.x() > (b.x() + b.width() * .5) && m != _score->lastMeasureMM() && m->nextMeasure()->system() == m->system())
+                  m = m->nextMeasure();
+            anchor.setX(m->canvasBoundingRect().x());
+            anchor.setY(firstStaffOnly ? b.y() : s->staff(staffIdx)->y() + s->pos().y() + s->page()->pos().y());
             setDropAnchor(QLineF(pos, anchor));
             return true;
             }
@@ -334,6 +340,8 @@ void ScoreView::dragMoveEvent(QDragMoveEvent* event)
 
       switch (editData.dropElement->type()) {
             case ElementType::VOLTA:
+                  event->setAccepted(dragMeasureAnchorElement(pos));
+                  break;
             case ElementType::PEDAL:
             case ElementType::LET_RING:
             case ElementType::VIBRATO:
@@ -412,6 +420,7 @@ void ScoreView::dropEvent(QDropEvent* event)
       editData.modifiers = event->keyboardModifiers();
 
       if (editData.dropElement) {
+            bool firstStaffOnly = false;
             bool applyUserOffset = false;
             bool triggerSpannerDropApplyTour = editData.dropElement->isSpanner();
             editData.dropElement->styleChanged();
@@ -420,6 +429,9 @@ void ScoreView::dropEvent(QDropEvent* event)
             _score->addRefresh(editData.dropElement->canvasBoundingRect());
             switch (editData.dropElement->type()) {
                   case ElementType::VOLTA:
+                        // voltas drop to first staff by default, or closest staff if Control is held
+                        firstStaffOnly = !(editData.modifiers & Qt::ControlModifier);
+                        // fall-thru
                   case ElementType::OTTAVA:
                   case ElementType::TRILL:
                   case ElementType::PEDAL:
@@ -430,7 +442,7 @@ void ScoreView::dropEvent(QDropEvent* event)
                   case ElementType::TEXTLINE:
                         {
                         Spanner* spanner = static_cast<Spanner*>(editData.dropElement);
-                        score()->cmdAddSpanner(spanner, pos);
+                        score()->cmdAddSpanner(spanner, pos, firstStaffOnly);
                         score()->setUpdateAll();
                         event->acceptProposedAction();
                         }
