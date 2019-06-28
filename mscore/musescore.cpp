@@ -2052,6 +2052,7 @@ void MuseScore::updateMenus()
       connect(openRecent,     SIGNAL(aboutToShow()),       SLOT(openRecentMenu()));
       connect(openRecent,     SIGNAL(triggered(QAction*)), SLOT(selectScore(QAction*)));
       connect(menuWorkspaces, SIGNAL(aboutToShow()),       SLOT(showWorkspaceMenu()));
+      connect(menuPlugins,    SIGNAL(aboutToShow()),       SLOT(showPluginsMenu()));
       setMenuTitles();
       }
       
