@@ -93,5 +93,17 @@ Element* wrap(Ms::Element* e, Ownership own)
             }
       return wrap<Element>(e, own);
       }
+
+//---------------------------------------------------------
+//   unwrap
+///   \cond PLUGIN_API \private \endcond
+///   Returns the Ms::Element that corresponds to the given Ms::PluginAPI::Element.
+//---------------------------------------------------------
+
+Ms::Element* unwrap(Element* e)
+      {
+      return e->element();
+      }
+
 }
 }

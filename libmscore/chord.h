@@ -36,12 +36,6 @@ class LedgerLine;
 class AccidentalState;
 
 enum class TremoloChordType : char { TremoloSingle, TremoloFirstNote, TremoloSecondNote };
-enum class PlayEventType : char    {
-      Auto,       // Play events for all notes are calculated by MuseScore.
-      User,       // Some play events are modified by user. The events must be written into the mscx file.
-      InvalidUser // The user modified play events must be replaced by MuseScore generated ones on
-                  // next recalculation. The actual play events must be saved on the undo stack.
-      };
 
 //---------------------------------------------------------
 //   @@ Chord

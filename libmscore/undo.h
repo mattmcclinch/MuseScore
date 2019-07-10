@@ -37,6 +37,7 @@
 #include "stafftype.h"
 #include "cleflist.h"
 #include "note.h"
+#include "chord.h"
 #include "drumset.h"
 #include "rest.h"
 #include "fret.h"
@@ -896,6 +897,24 @@ class ChangeNoteEvents : public UndoCommand {
    public:
       ChangeNoteEvents(Chord* /*n*/, const QList<NoteEvent*>& l) : /*chord(n),*/ events(l) {}
       UNDO_NAME("ChangeNoteEvents")
+      };
+
+//---------------------------------------------------------
+//   ChangeNoteEventList
+//---------------------------------------------------------
+
+class ChangeNoteEventList : public UndoCommand {
+      Ms::Note*      note;
+      NoteEventList* oldEvents;
+      NoteEventList  newEvents;
+      PlayEventType  petype;
+
+      void flip(EditData*) override;
+
+   public:
+      ChangeNoteEventList(Ms::Note* n, NoteEventList* oe, NoteEventList& ne) :
+         note(n), oldEvents(oe), newEvents(ne), petype(PlayEventType::User) {}
+      UNDO_NAME("ChangeNoteEventList")
       };
 
 //---------------------------------------------------------
