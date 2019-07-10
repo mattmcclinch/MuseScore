@@ -12,6 +12,7 @@
 
 #include "elements.h"
 #include "libmscore/property.h"
+#include "libmscore/undo.h"
 
 namespace Ms {
 namespace PluginAPI {
@@ -67,6 +68,16 @@ void Note::setTpc(int val)
             set(Pid::TPC1, val);
       else
             set(Pid::TPC2, val);
+      }
+
+//---------------------------------------------------------
+//   Chord::setPlayEventType
+//---------------------------------------------------------
+
+void Chord::setPlayEventType(Ms::PlayEventType v)
+      {
+      chord()->score()->setPlaylistDirty();
+      chord()->score()->undo(new ChangeChordPlayEventType(this->chord(), v));
       }
 
 //---------------------------------------------------------
