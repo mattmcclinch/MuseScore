@@ -22,6 +22,10 @@
 #include "libmscore/notedot.h"
 #include "libmscore/segment.h"
 #include "libmscore/accidental.h"
+#include "libmscore/musescoreCore.h"
+#include "libmscore/score.h"
+#include "libmscore/undo.h"
+#include "playevent.h"
 
 namespace Ms {
 namespace PluginAPI {
@@ -348,6 +352,11 @@ class Note : public Element {
       Q_PROPERTY(QQmlListProperty<Ms::PluginAPI::Element>  dots              READ dots)
 //       Q_PROPERTY(int                            dotsCount         READ qmlDotsCount)
       Q_PROPERTY(QQmlListProperty<Ms::PluginAPI::Element>  elements          READ elements)
+      /// List of PlayEvents associated with this note.
+      /// Important: You must call Score.createPlayEvents()
+      /// to see meaningfull data in the PlayEvent lists.
+      /// \since MuseScore 3.4
+      Q_PROPERTY(QQmlListProperty<Ms::PluginAPI::PlayEvent> playEvents READ playEvents)
 //       Q_PROPERTY(int                            fret              READ fret               WRITE undoSetFret)
 //       Q_PROPERTY(bool                           ghost             READ ghost              WRITE undoSetGhost)
 //       Q_PROPERTY(Ms::NoteHead::Group            headGroup         READ headGroup          WRITE undoSetHeadGroup)
@@ -403,8 +412,9 @@ class Note : public Element {
       int tpc() const { return note()->tpc(); }
       void setTpc(int val);
 
-      QQmlListProperty<Element> dots()     { return wrapContainerProperty<Element>(this, note()->dots()); }
+      QQmlListProperty<Element> dots() { return wrapContainerProperty<Element>(this, note()->dots()); }
       QQmlListProperty<Element> elements() { return wrapContainerProperty<Element>(this, note()->el());   }
+      QQmlListProperty<PlayEvent> playEvents() { return wrapPlayEventsContainerProperty<PlayEvent>(this, note()->playEvents()); }
 
       Element* accidental() { return wrap<Element>(note()->accidental()); }
 

@@ -332,6 +332,7 @@ void PluginAPI::registerQmlTypes()
       qmlRegisterType<Measure>();
       qmlRegisterType<Part>();
       qmlRegisterType<Excerpt>();
+      qmlRegisterType<PlayEvent>();
       //qmlRegisterType<Hook>();
       //qmlRegisterType<Stem>();
       //qmlRegisterType<StemSlash>();
