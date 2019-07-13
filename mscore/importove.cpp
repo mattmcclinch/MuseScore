@@ -1694,6 +1694,22 @@ void OveToMScore::convertNotes(Measure* measure, int part, int staff, int track)
                   convertArticulation(measure, cr, noteTrack, tick, articulations[j]);
                   }
             }
+      // Now add articulations not contained in a NoteContainer
+      QList<OVE::MusicData*> decorators = measureData->getMusicDatas(OVE::MusicDataType::Decorator);
+      for (int i = 0; i < decorators.size(); ++i) {
+            OVE::Decorator* decorator = static_cast<OVE::Decorator*>(decorators[i]);
+            if (decorator->getDecoratorType() == OVE::Decorator::Type::Articulation) {
+                  OVE::Articulation* art = new OVE::Articulation;
+                  art->setArtType(int(decorator->getArticulationType()));
+                  int absTick = mtt_->getTick(measure->no(), decorator->getTick());
+                  // We need to find a ChordRest to pass to convertArticulation(),
+                  // but we cannot get it from the articulation's tick.
+                  OVE::NoteContainer* container = getContainerByPos(part, staff, decorator->start()->shiftMeasure(0));
+                  Fraction tick = container ? Fraction::fromTicks(mtt_->getTick(measure->no(), container->getTick())) : measure->tick();
+                  ChordRest* cr = measure->findChordRest(tick, track);
+                  convertArticulation(measure, cr, track, absTick, art);
+                  }
+            }
       }
 
 void OveToMScore::convertArticulation(
@@ -1939,24 +1955,23 @@ void OveToMScore::convertArticulation(
                   break;
                   }
             case OVE::ArticulationType::Pedal_Down :{
-                  if (pedal_) {
-                        delete pedal_;
-                        pedal_ = 0;
-                        }
-                  else {
-                        pedal_ = new Pedal(score_);
-                        pedal_->setTrack(track);
-                        Segment* seg = measure->getSegment(SegmentType::ChordRest, Fraction::fromTicks(absTick));
-                        pedal_->setTick(seg->tick());
-                        score_->addSpanner(pedal_);
-                        }
+                  Fraction tick = Fraction::fromTicks(absTick);
+                  if (pedal_)
+                        pedal_->setTick2(tick);
+                  pedal_ = new Pedal(score_);
+                  pedal_->setTrack(track);
+                  pedal_->setTick(tick);
+                  pedal_->setTick2(tick);
+                  pedal_->setBeginText("<sym>keyboardPedalPed</sym>");
+                  pedal_->setLineVisible(false);
+                  score_->addSpanner(pedal_);
                   break;
                   }
             case OVE::ArticulationType::Pedal_Up :{
-                  if(pedal_){
-                        Segment* seg = measure->getSegment(SegmentType::ChordRest, Fraction::fromTicks(absTick));
-                        pedal_->setTick2(seg->tick());
-                        pedal_ = 0;
+                  if (pedal_) {
+                        pedal_->setTick2(Fraction::fromTicks(absTick));
+                        pedal_->setEndText("<sym>keyboardPedalUp</sym>");
+                        pedal_ = nullptr;
                         }
                   break;
                   }
