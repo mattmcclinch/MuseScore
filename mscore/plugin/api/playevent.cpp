@@ -45,13 +45,12 @@ void PlayEvent::setPitch(int v)
             }
       else
             {
-            Note* parNote = static_cast<Note*>(parentNote);
-            Ms::Score* score = parNote->note()->score();
+            Ms::Score* score = parentNote->note()->score();
             if (!score) {
                   qWarning("PluginAPI::PlayEvent::setOntime: A score is required.");
                   return;
                   }
-            int parentPitch = parNote->note()->pitch();
+            int parentPitch = parentNote->note()->pitch();
             // A NoteEvent's pitch is actually summed with the parent pitch. This
             // check ensures that it doesn't result with an illegal pitch.
             if (!pitchIsValid(v + parentPitch)) {
@@ -60,7 +59,7 @@ void PlayEvent::setPitch(int v)
                   }
             Ms::NoteEvent e = *ne;                    // Make copy of NoteEvent value
             e.setPitch(v);                            // Set new ontTime value
-            score->undo(new ChangeNoteEvent(parNote->note(), ne, e));
+            score->undo(new ChangeNoteEvent(parentNote->note(), ne, e));
             }
       }
 
@@ -85,15 +84,14 @@ void PlayEvent::setOntime(int v)
             }
       else
             {
-            Note* parNote = static_cast<Note*>(parentNote);
-            Ms::Score* score = parNote->note()->score();
+            Ms::Score* score = parentNote->note()->score();
             if (!score) {
                   qWarning("PluginAPI::PlayEvent::setOntime: A score is required.");
                   return;
                   }
             Ms::NoteEvent e = *ne;                    // Make copy of NoteEvent value
             e.setOntime(v);                           // Set new ontTime value
-            score->undo(new ChangeNoteEvent(parNote->note(), ne, e));
+            score->undo(new ChangeNoteEvent(parentNote->note(), ne, e));
             }
       }
 
@@ -115,15 +113,14 @@ void PlayEvent::setLen(int v)
             }
       else
             {
-            Note* parNote = static_cast<Note*>(parentNote);
-            Ms::Score* score = parNote->note()->score();
+            Ms::Score* score = parentNote->note()->score();
             if (!score) {
                   qWarning("PluginAPI::PlayEvent::setLen: A score is required.");
                   return;
                   }
             Ms::NoteEvent e = *ne;                    // Make copy of NoteEvent value
             e.setLen(v);                              // Set new length value
-            score->undo(new ChangeNoteEvent(parNote->note(), ne, e));
+            score->undo(new ChangeNoteEvent(parentNote->note(), ne, e));
             }
       }
 

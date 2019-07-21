@@ -19,6 +19,8 @@
 namespace Ms {
 namespace PluginAPI {
 
+class Note;
+
 //---------------------------------------------------------
 //   PlayEvent
 //    Wrapper class for internal Ms::NoteEvent
@@ -46,18 +48,18 @@ class PlayEvent : public QObject {
 
    protected:
       Ms::NoteEvent* ne;
-      QObject* parentNote;
+      Note* parentNote;
 
    public:
 
-      PlayEvent(Ms::NoteEvent* _ne = new Ms::NoteEvent(), QObject* _parent = nullptr)
+      PlayEvent(Ms::NoteEvent* _ne = new Ms::NoteEvent(), Note* _parent = nullptr)
          : QObject(), ne(_ne), parentNote(_parent) {}
       // Delete the NoteEvent if parentless.
       virtual ~PlayEvent() { if (parentNote == nullptr) delete ne; }
 
       const Ms::NoteEvent& getNoteEvent() { return *ne; }
-      void setParentNote(QObject* parent) { this->parentNote = parent; }
-      Note* note() { return reinterpret_cast<Note*>(parentNote); }
+      void setParentNote(Note* parent) { this->parentNote = parent; }
+      Note* note() { return parentNote; }
 
       int pitch() const { return ne->pitch(); }
       int ontime() const { return ne->ontime(); }
@@ -75,7 +77,7 @@ class PlayEvent : public QObject {
 ///   \relates Ms::NoteEvent
 //---------------------------------------------------------
 
-inline PlayEvent* playEventWrap(Ms::NoteEvent* t, QObject* parent)
+inline PlayEvent* playEventWrap(Ms::NoteEvent* t, Note* parent)
       {
       PlayEvent* w = t ? new PlayEvent(t, parent) : nullptr;
       // All wrapper objects should belong to JavaScript code.
@@ -100,7 +102,7 @@ class QmlPlayEventsListAccess : public QQmlListProperty<PlayEvent> {
          : QQmlListProperty<PlayEvent>(obj, &container, &append, &count, &at, &clear) {};
 
    static int count(QQmlListProperty<PlayEvent>* l)  { return int(static_cast<NoteEventList*>(l->data)->size()); }
-   static PlayEvent* at(QQmlListProperty<PlayEvent>* l, int i) { return playEventWrap(&(*(static_cast<NoteEventList*>(l->data)))[i], l->object); }
+   static PlayEvent* at(QQmlListProperty<PlayEvent>* l, int i) { return playEventWrap(&(*(static_cast<NoteEventList*>(l->data)))[i], reinterpret_cast<Note*>(l->object)); }
    static void clear(QQmlListProperty<PlayEvent>* l);
    static void append(QQmlListProperty<PlayEvent>* l, PlayEvent *v);
 };
