@@ -192,6 +192,7 @@ void Stem::draw(QPainter* painter) const
             painter->setBrush(QBrush(curColor()));
             painter->setPen(Qt::NoPen);
             painter->drawPath(path);
+            MScore::useQFont = false;
             }
 
       // dots
@@ -205,6 +206,7 @@ void Stem::draw(QPainter* painter) const
             for (int dot = 0; dot < nDots; dot++, x += step)
                   drawSymbol(SymId::augmentationDot, painter, QPointF(x, y));
             }
+      MScore::useQFont = true;
       }
 
 //---------------------------------------------------------

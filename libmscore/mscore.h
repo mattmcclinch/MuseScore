@@ -364,6 +364,7 @@ class MScore {
 
       static bool noExcerpts;
       static bool noImages;
+      static bool useQFont;
 
       static bool pdfPrinting;
       static bool svgPrinting;

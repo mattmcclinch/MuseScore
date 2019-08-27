@@ -5647,7 +5647,7 @@ void ScoreFont::draw(SymId id, QPainter* painter, const QSizeF& mag, const QPoin
             return;
             }
 
-      if (MScore::pdfPrinting) {
+      if (MScore::pdfPrinting && MScore::useQFont) {
             if (font == 0) {
                   QString s(_fontPath+_filename);
                   if (-1 == QFontDatabase::addApplicationFont(s)) {

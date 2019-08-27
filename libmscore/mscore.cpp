@@ -109,6 +109,7 @@ int     MScore::mtcType;
 
 bool    MScore::noExcerpts = false;
 bool    MScore::noImages = false;
+bool    MScore::useQFont = true;
 bool    MScore::pdfPrinting = false;
 bool    MScore::svgPrinting = false;
 
