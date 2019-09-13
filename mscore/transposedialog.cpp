@@ -34,6 +34,7 @@
 #include "libmscore/segment.h"
 #include "libmscore/stafftype.h"
 #include "libmscore/clef.h"
+#include "preferences.h"
 
 namespace Ms {
 
@@ -46,6 +47,10 @@ TransposeDialog::TransposeDialog(QWidget* parent)
       {
       setObjectName("TransposeDialog");
       setupUi(this);
+      transposeKeys->setChecked(preferences.getBool(PREF_DEFAULT_TRANSPOSE_KEYSIGNATURES));
+      keepDegreeAlterations->setChecked(preferences.getBool(PREF_DEFAULT_TRANSPOSE_KEEPDEGREEALTERATIONS));
+      transposeChordNames->setChecked(preferences.getBool(PREF_DEFAULT_TRANSPOSE_CHORDSYMBOLS));
+      accidentalOptions->setCurrentIndex(preferences.getBool(PREF_DEFAULT_TRANSPOSE_USEDOUBLESHARPSANDFLATS) ? 1 : 0);
       setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
       connect(transposeByKey, SIGNAL(clicked(bool)), SLOT(transposeByKeyToggled(bool)));
@@ -101,8 +106,8 @@ void TransposeDialog::enableTransposeByKey(bool val)
 void TransposeDialog::enableTransposeChordNames(bool val)
       {
       transposeChordNames->setEnabled(val);
-      transposeChordNames->setChecked(!val);
-      transposeChordNames->setChecked(val);
+      if (!val)
+            transposeChordNames->setChecked(false);
       }
 
 //---------------------------------------------------------
