@@ -2079,6 +2079,31 @@ bool Note::dotIsUp() const
       }
 
 //---------------------------------------------------------
+//   switchSubtype
+//    if relLine is double-sharp or double-flat, set the following sharp to natural-sharp or flat to natural-flat;
+//    if relLine is no longer double-sharp or double-flat, switch back
+//---------------------------------------------------------
+
+static AccidentalType switchSubtype(AccidentalType acci, bool isNaturalSharp, bool isNaturalFlat)
+      {
+            if (isNaturalSharp) {
+                  if (acci == AccidentalType::SHARP)
+                        acci = AccidentalType::NATURAL_SHARP;
+                  }
+            else if (isNaturalFlat) {
+                  if (acci == AccidentalType::FLAT)
+                        acci = AccidentalType::NATURAL_FLAT;
+                  }
+            else {
+                  if (acci == AccidentalType::NATURAL_SHARP)
+                        acci = AccidentalType::SHARP;
+                  else if (acci == AccidentalType::NATURAL_FLAT)
+                        acci = AccidentalType::FLAT;
+                  }
+            return acci;
+      }
+
+//---------------------------------------------------------
 //   updateAccidental
 //    set _accidental and _line depending on tpc
 //---------------------------------------------------------
@@ -2096,13 +2121,29 @@ void Note::updateAccidental(AccidentalState* as)
             AccidentalVal accVal = tpc2alter(tpc());
             bool error = false;
             AccidentalVal relLineAccVal = as->accidentalVal(relLine, error);
+
+            bool isNaturalSharp = false;
+            bool isNaturalFlat = false;
+            if (relLineAccVal == AccidentalVal::SHARP2)
+                  isNaturalSharp = true;
+            if (relLineAccVal == AccidentalVal::FLAT2)
+                  isNaturalFlat = true;
+                  
             if (error) {
-                  qDebug("error accidetalVal");
+                  qDebug("error accidentalVal");
                   return;
                   }
             if ((accVal != relLineAccVal) || hidden() || as->tieContext(relLine)) {
                   as->setAccidentalVal(relLine, accVal, _tieBack != 0 && _accidental == 0);
                   acci = Accidental::value2subtype(accVal);
+                  // if relLine is double-sharp or double-flat,
+                  // if current note has an AUTO accidental and it is sharp or flat,
+                  // or it doesn't have an accidental but its accVal != 0 because of the key signature,
+                  // turn the accidental to or add an accidental of natural-sharp or natural-flat
+                  if (_accidental && _accidental->role() == AccidentalRole::AUTO
+                     || !_accidental && accVal != AccidentalVal::NATURAL) {
+                        acci = switchSubtype(acci, isNaturalSharp, isNaturalFlat);
+                        }
                   // if previous tied note has same tpc, don't show accidental
                   if (_tieBack && _tieBack->startNote()->tpc1() == tpc1())
                         acci = AccidentalType::NONE;
@@ -2131,6 +2172,10 @@ void Note::updateAccidental(AccidentalState* as)
                         else {
                               // keep it, but update type if needed
                               acci = Accidental::value2subtype(accVal);
+                              if (_accidental && _accidental->role() == AccidentalRole::AUTO
+                                 || !_accidental && accVal != AccidentalVal::NATURAL) {
+                                    acci = switchSubtype(acci, isNaturalSharp, isNaturalFlat);
+                                    }
                               if (acci == AccidentalType::NONE)
                                     acci = AccidentalType::NATURAL;
                               if (_accidental->accidentalType() != acci) {

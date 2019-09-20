@@ -1673,25 +1673,29 @@ void Score::changeAccidental(Note* note, AccidentalType accidental)
 
       int tpc = step2tpc(step, acc);
 
+      bool isNaturalSOrF = false;
       bool forceRemove = false;
       bool forceAdd = false;
+
+      if (accidental == AccidentalType::NATURAL_SHARP || accidental == AccidentalType::NATURAL_FLAT)
+            isNaturalSOrF = true;
 
       // delete accidental
       // both for this note and for any linked notes
       if (accidental == AccidentalType::NONE)
             forceRemove = true;
 
-      // precautionary or microtonal accidental
+      // precautionary or microtonal or natural-sharp/flat
       // either way, we display it unconditionally
       // both for this note and for any linked notes
-      else if (acc == acc2 || pitch == note->pitch() || Accidental::isMicrotonal(accidental))
+      else if (acc == acc2 || pitch == note->pitch() || Accidental::isMicrotonal(accidental) || isNaturalSOrF)
             forceAdd = true;
 
       for (ScoreElement* se : note->linkList()) {
             Note* ln = toNote(se);
             if (ln->concertPitch() != note->concertPitch())
                   continue;
-            Score* lns    = ln->score();
+            Score* lns = ln->score();
             Accidental* a = ln->accidental();
             if (forceRemove) {
                   if (a)
