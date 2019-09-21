@@ -2114,7 +2114,9 @@ void Note::updateAccidental(AccidentalState* as)
 
       // don't touch accidentals that don't concern tpc such as
       // quarter tones
-      if (!(_accidental && Accidental::isMicrotonal(_accidental->accidentalType()))) {
+      if (!(_accidental && (Accidental::isMicrotonal(_accidental->accidentalType()) ||
+                           (_accidental->accidentalType() == AccidentalType::NATURAL_SHARP) ||
+                           (_accidental->accidentalType() == AccidentalType::NATURAL_FLAT)))) {
             // calculate accidental
             AccidentalType acci = AccidentalType::NONE;
 
@@ -2128,7 +2130,7 @@ void Note::updateAccidental(AccidentalState* as)
                   isNaturalSharp = true;
             if (relLineAccVal == AccidentalVal::FLAT2)
                   isNaturalFlat = true;
-                  
+
             if (error) {
                   qDebug("error accidentalVal");
                   return;
@@ -2140,8 +2142,8 @@ void Note::updateAccidental(AccidentalState* as)
                   // if current note has an AUTO accidental and it is sharp or flat,
                   // or it doesn't have an accidental but its accVal != 0 because of the key signature,
                   // turn the accidental to or add an accidental of natural-sharp or natural-flat
-                  if (_accidental && _accidental->role() == AccidentalRole::AUTO
-                     || !_accidental && accVal != AccidentalVal::NATURAL) {
+                  if ((_accidental && _accidental->role() == AccidentalRole::AUTO)
+                     || (!_accidental && accVal != AccidentalVal::NATURAL)) {
                         acci = switchSubtype(acci, isNaturalSharp, isNaturalFlat);
                         }
                   // if previous tied note has same tpc, don't show accidental
@@ -2172,8 +2174,8 @@ void Note::updateAccidental(AccidentalState* as)
                         else {
                               // keep it, but update type if needed
                               acci = Accidental::value2subtype(accVal);
-                              if (_accidental && _accidental->role() == AccidentalRole::AUTO
-                                 || !_accidental && accVal != AccidentalVal::NATURAL) {
+                              if ((_accidental && _accidental->role() == AccidentalRole::AUTO)
+                                 || (!_accidental && accVal != AccidentalVal::NATURAL)) {
                                     acci = switchSubtype(acci, isNaturalSharp, isNaturalFlat);
                                     }
                               if (acci == AccidentalType::NONE)
@@ -2195,7 +2197,14 @@ void Note::updateAccidental(AccidentalState* as)
             // ultimetely, they should probably get their own state
             // for now, at least change state to natural, so subsequent notes playback as might be expected
             // this is an incompatible change, but better to break it for 2.0 than wait until later
-            as->setAccidentalVal(relLine, AccidentalVal::NATURAL, _tieBack != 0 && _accidental == 0);
+            AccidentalVal accVal = AccidentalVal::NATURAL;
+
+            if (_accidental->accidentalType() == AccidentalType::NATURAL_SHARP)
+                  accVal = AccidentalVal::SHARP;
+            else if (_accidental->accidentalType() == AccidentalType::NATURAL_FLAT)
+                  accVal = AccidentalVal::FLAT;
+
+            as->setAccidentalVal(relLine, accVal, _tieBack != 0 && _accidental == 0);
             }
 
       updateRelLine(relLine, true);
