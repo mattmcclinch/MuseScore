@@ -382,6 +382,22 @@ double Preferences::getDouble(const QString key) const
       return pref;
       }
 
+QVariant Preferences::getVariant(const QString key) const
+      {
+      if (!_allPreferences.contains(key)) {
+            qWarning("Preference not found: %s", qPrintable(key));
+            return QVariant();
+            }
+
+      QVariant pref = get(key);
+
+      // pref is invalid both if setting is not found or pref is an invalid QVariant object
+      if (!pref.isValid() || pref.isNull() || _returnDefaultValues)
+            return defaultValue(key);
+      else
+            return pref;
+      }
+
 SessionStart Preferences::sessionStart() const
       {
       return preference(PREF_APP_STARTUP_SESSIONSTART).value<SessionStart>();

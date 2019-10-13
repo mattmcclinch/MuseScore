@@ -492,6 +492,10 @@ enum class PlayEventType : char {
 enum class TupletNumberType  : char { SHOW_NUMBER, SHOW_RELATION, NO_TEXT         };
 enum class TupletBracketType : char { AUTO_BRACKET, SHOW_BRACKET, SHOW_NO_BRACKET };
 
+enum class SessionStart : char { EMPTY, LAST, NEW, SCORE };
+enum class MuseScoreStyleType : char { DARK_FUSION, LIGHT_FUSION };
+enum class MusicxmlExportBreaks : char { ALL, MANUAL, NO };
+
 #ifdef SCRIPT_INTERFACE
 Q_ENUM_NS(ElementType);
 Q_ENUM_NS(Direction);
@@ -504,6 +508,9 @@ Q_ENUM_NS(Align);
 Q_ENUM_NS(NoteType);
 Q_ENUM_NS(PlayEventType);
 Q_ENUM_NS(AccidentalType);
+Q_ENUM_NS(SessionStart);
+Q_ENUM_NS(MuseScoreStyleType);
+Q_ENUM_NS(MusicxmlExportBreaks);
 #endif
 
 //hack: to force the build system to run moc on this file
@@ -529,5 +536,11 @@ Q_DECLARE_METATYPE(Ms::NoteType);
 Q_DECLARE_METATYPE(Ms::PlayEventType);
 
 Q_DECLARE_METATYPE(Ms::AccidentalType);
+
+Q_DECLARE_METATYPE(Ms::SessionStart);
+
+Q_DECLARE_METATYPE(Ms::MusicxmlExportBreaks);
+
+Q_DECLARE_METATYPE(Ms::MuseScoreStyleType);
 
 #endif

@@ -112,6 +112,7 @@ set (SOURCE_LIB
       ${PROJECT_SOURCE_DIR}/mscore/plugin/api/selection.cpp
       ${PROJECT_SOURCE_DIR}/mscore/plugin/api/tie.cpp
       ${PROJECT_SOURCE_DIR}/mscore/plugin/api/playevent.cpp
+      ${PROJECT_SOURCE_DIR}/mscore/plugin/api/preferences.cpp
       ${PROJECT_SOURCE_DIR}/mscore/preferences.cpp
       ${PROJECT_SOURCE_DIR}/mscore/shortcut.cpp
       ${PROJECT_SOURCE_DIR}/mscore/stringutils.cpp

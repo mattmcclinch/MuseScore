@@ -35,6 +35,7 @@ class Element;
 class FractionWrapper;
 class MsProcess;
 class Score;
+class Preferences;
 
 #define DECLARE_API_ENUM(qmlName, cppName) \
       Q_PROPERTY(Ms::PluginAPI::Enum* qmlName READ get_##cppName CONSTANT) \
@@ -83,6 +84,8 @@ class PluginAPI : public Ms::QmlPlugin {
       Q_PROPERTY(Ms::PluginAPI::Score* curScore     READ curScore)
       /** List of currently open scores (read only).\n \since MuseScore 3.2 */
       Q_PROPERTY(QQmlListProperty<Ms::PluginAPI::Score> scores READ scores)
+      /** Access to MuseScore's preferences */
+      Q_PROPERTY(Ms::PluginAPI::Preferences* preferences READ preferences)
 
       // Should be initialized in qmlpluginapi.cpp
       /// Contains Ms::ElementType enumeration values
@@ -146,6 +149,12 @@ class PluginAPI : public Ms::QmlPlugin {
       /// Contains Ms::SegmentType enumeration values
       DECLARE_API_ENUM( Segment,          segmentTypeEnum         )
       DECLARE_API_ENUM( Spanner,          spannerAnchorEnum       ) // probably unavailable in 2.X
+      /// Contains Ms::SessionStart enumeration values
+      DECLARE_API_ENUM( SessionStart,         sessionStartEnum         )
+      /// Contains Ms::MusicxmlExportBreaks enumeration values
+      DECLARE_API_ENUM( MusicxmlExportBreaks, musicxmlExportBreaksEnum )
+      /// Contains Ms::MuseScoreStyleType enumeration values
+      DECLARE_API_ENUM( MuseScoreStyleType,   museScoreStyleTypeEnum   )
 
       QFile logFile;
 
@@ -220,6 +229,7 @@ class PluginAPI : public Ms::QmlPlugin {
 
       Score* curScore() const;
       QQmlListProperty<Score> scores();
+      Preferences* preferences() const;
       /// \endcond
 
       Q_INVOKABLE Ms::PluginAPI::Score* newScore(const QString& name, const QString& part, int measures);

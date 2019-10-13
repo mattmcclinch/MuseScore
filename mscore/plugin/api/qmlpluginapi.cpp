@@ -19,6 +19,7 @@
 #include "util.h"
 #include "selection.h"
 #include "tie.h"
+#include "preferences.h"
 
 #ifndef TESTROOT
 #include "shortcut.h"
@@ -52,6 +53,9 @@ Enum* PluginAPI::noteHeadGroupEnum;
 Enum* PluginAPI::noteValueTypeEnum;
 Enum* PluginAPI::segmentTypeEnum;
 Enum* PluginAPI::spannerAnchorEnum;
+Enum* PluginAPI::sessionStartEnum;
+Enum* PluginAPI::musicxmlExportBreaksEnum;
+Enum* PluginAPI::museScoreStyleTypeEnum;
 
 //---------------------------------------------------------
 //   PluginAPI::initEnums
@@ -82,6 +86,9 @@ void PluginAPI::initEnums() {
       PluginAPI::noteValueTypeEnum = wrapEnum<Ms::Note::ValueType>();
       PluginAPI::segmentTypeEnum = wrapEnum<Ms::SegmentType>();
       PluginAPI::spannerAnchorEnum = wrapEnum<Ms::Spanner::Anchor>();
+      PluginAPI::sessionStartEnum = wrapEnum<Ms::SessionStart>();
+      PluginAPI::musicxmlExportBreaksEnum = wrapEnum<Ms::MusicxmlExportBreaks>();
+      PluginAPI::museScoreStyleTypeEnum = wrapEnum<Ms::MuseScoreStyleType>();
 
       initialized = true;
       }
@@ -113,6 +120,16 @@ Score* PluginAPI::curScore() const
 QQmlListProperty<Score> PluginAPI::scores()
       {
       return wrapContainerProperty<Score>(this, msc()->scores());
+      }
+
+//---------------------------------------------------------
+//   preferences
+//---------------------------------------------------------
+
+Preferences* PluginAPI::preferences() const
+      {
+      static Preferences prefs;
+      return &prefs;
       }
 
 //---------------------------------------------------------
@@ -354,6 +371,7 @@ void PluginAPI::registerQmlTypes()
       qmlRegisterType<Selection>();
       qmlRegisterType<Tie>();
       qmlRegisterType<PlayEvent>("MuseScore", 3, 0, "PlayEvent");
+      qmlRegisterType<Preferences>();
       //qmlRegisterType<Hook>();
       //qmlRegisterType<Stem>();
       //qmlRegisterType<StemSlash>();

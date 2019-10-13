@@ -30,14 +30,11 @@
  */
 
 #include "globals.h"
+#include "libmscore/types.h"
 
 namespace Ms {
 
 extern QString mscoreGlobalShare;
-
-enum class SessionStart : char {
-      EMPTY, LAST, NEW, SCORE
-      };
 
 // midi remote control values:
 enum {
@@ -60,16 +57,6 @@ enum {
       RMIDI_NOTE_EDIT_MODE,
       RMIDI_REALTIME_ADVANCE,
       MIDI_REMOTES
-      };
-
-enum class MuseScoreStyleType : char {
-      DARK_FUSION = 0,
-      LIGHT_FUSION
-      };
-
-// MusicXML export break values
-enum class MusicxmlExportBreaks : char {
-      ALL, MANUAL, NO
       };
 
 //
@@ -331,6 +318,7 @@ class Preferences {
       QString getString(const QString key) const;
       int getInt(const QString key) const;
       double getDouble(const QString key) const;
+      QVariant getVariant(const QString key) const;
 
       // general setters
       void setToDefaultValue(const QString key);
@@ -399,9 +387,5 @@ class PreferenceVisitor {
 
 
 } // namespace Ms
-
-Q_DECLARE_METATYPE(Ms::SessionStart);
-Q_DECLARE_METATYPE(Ms::MusicxmlExportBreaks);
-Q_DECLARE_METATYPE(Ms::MuseScoreStyleType);
 
 #endif

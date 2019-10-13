@@ -62,6 +62,7 @@ if (SCRIPT_INTERFACE)
             plugin/api/selection.h
             plugin/api/tie.h
             plugin/api/playevent.h
+            plugin/api/preferences.h
 
             plugin/api/enums.cpp
             plugin/mscorePlugins.cpp plugin/pluginCreator.cpp plugin/pluginManager.cpp plugin/qmledit.cpp
@@ -74,6 +75,7 @@ if (SCRIPT_INTERFACE)
             plugin/api/selection.cpp
             plugin/api/tie.cpp
             plugin/api/playevent.cpp
+            plugin/api/preferences.cpp
             )
 
       set (SCRIPT_UI
