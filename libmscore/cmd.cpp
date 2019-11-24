@@ -3179,12 +3179,16 @@ void Score::cmdRemoveEmptyTrailingMeasures()
 void Score::cmdPitchUp()
       {
       Element* el = selection().element();
-      if (el && el->isLyrics())
-            cmdMoveLyrics(toLyrics(el), Direction::UP);
-      else if (el && (el->isArticulation() || el->isTextBase()))
-            el->undoChangeProperty(Pid::OFFSET, el->offset() + QPointF(0.0, -MScore::nudgeStep * el->spatium()), PropertyFlags::UNSTYLED);
-      else if (el && el->isRest())
-            cmdMoveRest(toRest(el), Direction::UP);
+      if (el) {
+            if (el->isNote())
+                  upDown(true, UpDownMode::CHROMATIC);
+            else if (el->isRest())
+                  cmdMoveRest(toRest(el), Direction::UP);
+            else if (el->isLyrics())
+                  cmdMoveLyrics(toLyrics(el), Direction::UP);
+            else
+                  el->undoChangeProperty(Pid::OFFSET, el->offset() + QPointF(0.0, -MScore::nudgeStep * el->spatium()), PropertyFlags::UNSTYLED);
+            }
       else
             upDown(true, UpDownMode::CHROMATIC);
       }
@@ -3196,12 +3200,16 @@ void Score::cmdPitchUp()
 void Score::cmdPitchDown()
       {
       Element* el = selection().element();
-      if (el && el->isLyrics())
-            cmdMoveLyrics(toLyrics(el), Direction::DOWN);
-      else if (el && (el->isArticulation() || el->isTextBase()))
-            el->undoChangeProperty(Pid::OFFSET, el->offset() + QPointF(0.0, MScore::nudgeStep * el->spatium()), PropertyFlags::UNSTYLED);
-      else if (el && el->isRest())
-            cmdMoveRest(toRest(el), Direction::DOWN);
+      if (el) {
+            if (el->isNote())
+                  upDown(false, UpDownMode::CHROMATIC);
+            else if (el->isRest())
+                  cmdMoveRest(toRest(el), Direction::DOWN);
+            else if (el->isLyrics())
+                  cmdMoveLyrics(toLyrics(el), Direction::DOWN);
+            else
+                  el->undoChangeProperty(Pid::OFFSET, el->offset() + QPointF(0.0, MScore::nudgeStep * el->spatium()), PropertyFlags::UNSTYLED);
+            }
       else
             upDown(false, UpDownMode::CHROMATIC);
       }
