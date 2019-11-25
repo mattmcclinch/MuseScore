@@ -1981,7 +1981,7 @@ void ScoreView::cmd(const char* s)
          || cmd == "next-measure"
          || cmd == "prev-measure") {
             Element* el = score()->selection().element();
-            if (el && (el->isTextBase())) {
+            if (el && (el->isTextBase() || !(el->parent() && (el->parent()->isNote() || el->parent()->isChordRest() || el->parent()->isSegment())))) {
                   score()->startCmd();
                   const PropertyFlags pf = PropertyFlags::UNSTYLED;
                   if (cmd == "prev-chord")
