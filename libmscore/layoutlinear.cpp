@@ -50,6 +50,8 @@ namespace Ms {
 void Score::resetSystems(bool layoutAll, LayoutContext& lc)
       {
       Page* page = 0;
+      System* system = 0;
+
       if (layoutAll) {
             for (System* s : _systems) {
                   for (SpannerSegment* ss : s->spannerSegments())
@@ -66,25 +68,28 @@ void Score::resetSystems(bool layoutAll, LayoutContext& lc)
 
             for (MeasureBase* mb = first(); mb; mb = mb->next())
                   mb->setSystem(0);
+            }
 
+      if (pages().isEmpty()) {
             page = new Page(this);
             pages().push_back(page);
             page->bbox().setRect(0.0, 0.0, loWidth(), loHeight());
             page->setNo(0);
+            }
+      else
+            page = pages().front();
 
-            System* system = new System(this);
+      if (systems().isEmpty()) {
+            system = new System(this);
             _systems.push_back(system);
             page->appendSystem(system);
-            system->adjustStavesNumber(nstaves());
             }
       else {
-            if (pages().isEmpty())
-                  return;
-            page = pages().front();
-            System* system = systems().front();
+            system = systems().front();
             system->clear();
-            system->adjustStavesNumber(nstaves());
             }
+
+      system->adjustStavesNumber(nstaves());
       lc.page = page;
       }
 
