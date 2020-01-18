@@ -3500,6 +3500,8 @@ static bool doConvert(Score* cs, const QJsonArray& outFiles, QString plugin)
                   }
             }
       if (!plugin.isEmpty()) {
+            int index = mscore->appendScore(cs->masterScore());
+            mscore->setCurrentView(index, 0);
             if (mscore->loadPlugin(plugin)) {
                   fprintf(stderr, "\tusing plugin <%s>\n", qPrintable(plugin));
                   mscore->pluginTriggered(0);
@@ -3661,7 +3663,10 @@ static bool convert(const QString& inFile, const QJsonArray& outFiles, const QSt
 
 static bool convert(const QString& inFile, const QString& outFile)
       {
-      return convert(inFile, QJsonArray{ outFile });
+      if (pluginMode)
+            return convert(inFile, QJsonArray{ outFile }, pluginName);
+      else
+            return convert(inFile, QJsonArray{ outFile });
       }
 
 //---------------------------------------------------------
@@ -3735,7 +3740,7 @@ static bool processNonGui(const QStringList& argv)
       else if (exportTransposedScore)
             return mscore->exportTransposedScoreToJSON(argv[0], transposeExportOptions);
 
-      if (pluginMode) {
+      if (pluginMode && !converterMode) {
             loadScores(argv);
             QString pn(pluginName);
             bool res = false;
@@ -3758,8 +3763,7 @@ static bool processNonGui(const QStringList& argv)
                         }
                   res = true;
                   }
-            if (!converterMode)
-                  return res;
+            return res;
             }
       if (converterMode) {
             if (processJob)
