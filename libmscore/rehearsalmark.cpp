@@ -102,8 +102,11 @@ QVariant RehearsalMark::propertyDefault(Pid id) const
 
 Sid RehearsalMark::getPropertyStyle(Pid pid) const
       {
-      if (pid == Pid::OFFSET)
-            return placeAbove() ? Sid::rehearsalMarkPosAbove : Sid::rehearsalMarkPosBelow;
+      if (pid == Pid::OFFSET) {
+            Sid sid = offsetSid(tid(), placeAbove());
+            if (sid != Sid::NOSTYLE)
+                  return sid;
+            }
       return TextBase::getPropertyStyle(pid);
       }
 

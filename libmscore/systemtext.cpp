@@ -63,8 +63,11 @@ void SystemText::layout()
 
 Sid SystemText::getPropertyStyle(Pid pid) const
       {
-      if (pid == Pid::OFFSET)
-            return placeAbove() ? Sid::systemTextPosAbove : Sid::systemTextPosBelow;
+      if (pid == Pid::OFFSET) {
+            Sid sid = offsetSid(tid(), placeAbove());
+            if (sid != Sid::NOSTYLE)
+                  return sid;
+            }
       return TextBase::getPropertyStyle(pid);
       }
 

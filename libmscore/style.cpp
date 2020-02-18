@@ -2858,6 +2858,34 @@ void MStyle::reset(Score* score)
             score->undo(new ChangeStyleVal(score, st.styleIdx(), MScore::defaultStyle().value(st.styleIdx())));
       }
 
+//---------------------------------------------------------
+//   offsetSid
+//---------------------------------------------------------
+
+Sid offsetSid(Tid tid, bool placeAbove)
+      {
+      switch (tid) {
+            case Tid::DYNAMICS:
+                  return placeAbove ? Sid::dynamicsPosAbove : Sid::dynamicsPosBelow;
+            case Tid::LYRICS_ODD:
+            case Tid::LYRICS_EVEN:
+                  return placeAbove ? Sid::lyricsPosAbove : Sid::lyricsPosBelow;
+            case Tid::REHEARSAL_MARK:
+                  return placeAbove ? Sid::rehearsalMarkPosAbove : Sid::rehearsalMarkPosBelow;
+            case Tid::STAFF:
+                  return placeAbove ? Sid::staffTextPosAbove : Sid::staffTextPosBelow;
+            case Tid::STICKING:
+                  return placeAbove ? Sid::stickingPosAbove : Sid::stickingPosBelow;
+            case Tid::SYSTEM:
+                  return placeAbove ? Sid::systemTextPosAbove : Sid::systemTextPosBelow;
+            case Tid::TEMPO:
+                  return placeAbove ? Sid::tempoPosAbove : Sid::tempoPosBelow;
+            default:
+                  break;
+            }
+      return Sid::NOSTYLE;
+      }
+
 #ifndef NDEBUG
 //---------------------------------------------------------
 //   checkStyles

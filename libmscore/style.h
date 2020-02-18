@@ -1353,6 +1353,8 @@ Tid textStyleFromName(const QString&);
 const std::vector<Tid>& allTextStyles();
 const std::vector<Tid>& primaryTextStyles();
 
+Sid offsetSid(Tid tid, bool placeAbove);
+
 #ifndef NDEBUG
 extern void checkStyles();
 #endif
