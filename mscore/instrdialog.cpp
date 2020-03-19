@@ -51,6 +51,7 @@ InstrumentsDialog::InstrumentsDialog(QWidget* parent)
       QAction* a = getAction("instruments");
       connect(a, SIGNAL(triggered()), SLOT(reject()));
       addAction(a);
+      connect(instrumentsWidget, SIGNAL(completeChanged(bool)), okButton, SLOT(setEnabled(bool)));
       saveButton->setVisible(false);
       loadButton->setVisible(false);
       readSettings();

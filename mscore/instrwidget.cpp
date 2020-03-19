@@ -491,6 +491,7 @@ void InstrumentsWidget::genPartList(Score* cs)
             }
       partiturList->resizeColumnToContents(2);  // adjust width of "Clef " and "Staff type" columns
       partiturList->resizeColumnToContents(4);
+      emit completeChanged(true);
       }
 
 //---------------------------------------------------------
@@ -547,7 +548,7 @@ void InstrumentsWidget::on_partiturList_itemSelectionChanged()
       bool first = (witems.first() == item);
       bool last = (witems.last() == item);
 
-      removeButton->setEnabled(flag && !onlyOne);
+      removeButton->setEnabled(flag);
       upButton->setEnabled(flag && !onlyOne && !first);
       downButton->setEnabled(flag && !onlyOne && !last);
       addLinkedStaffButton->setEnabled(item && item->type() == STAFF_LIST_ITEM);
@@ -619,11 +620,6 @@ void InstrumentsWidget::on_removeButton_clicked()
       QTreeWidgetItem* parent = item->parent();
 
       if (parent) {
-            if (parent->childCount() == 1) {
-                  Q_ASSERT(false); // shouldn't get here (remove button disabled when one item left)
-                  removeButton->setEnabled(false); // nevertheless, handle gracefully in release builds
-                  return;
-                  }
             if (((StaffListItem*)item)->op() == ListItemOp::ADD) {
                   if (parent->childCount() == 1) {
                         partiturList->takeTopLevelItem(partiturList->indexOfTopLevelItem(parent));
@@ -654,12 +650,6 @@ void InstrumentsWidget::on_removeButton_clicked()
             partiturList->setCurrentItem(parent);
             }
       else {
-            if (partiturList->topLevelItemCount() == 1) {
-                  Q_ASSERT(false); // shouldn't get here as (remove button disabled when one item left)
-                  removeButton->setEnabled(false); // nevertheless, handle gracefully in release builds
-                  emit completeChanged(false);
-                  return;
-                  }
             int idx = partiturList->indexOfTopLevelItem(item);
             if (((PartListItem*)item)->op == ListItemOp::ADD) {
                   partiturList->blockSignals(true);
@@ -688,6 +678,17 @@ void InstrumentsWidget::on_removeButton_clicked()
                   }
             partiturList->setCurrentItem(nextParent);
             }
+      // now check for any remaining instruments
+      const int count = partiturList->topLevelItemCount();
+      for (int idx = 0; idx < count; ++idx) {
+            QTreeWidgetItem* it = partiturList->topLevelItem(idx);
+            if (!it->isHidden()) {
+                  // an instrument has been found, so all is good
+                  return;
+                  }
+            }
+      // all instruments have been removed, so the widget is in an incomplete state
+      emit completeChanged(false);
       }
 
 //---------------------------------------------------------
