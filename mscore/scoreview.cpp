@@ -5080,8 +5080,9 @@ static bool needViewportMove(Score* cs, ScoreView* cv)
       mEnd = mEnd ? mEnd->nextMeasureMM() : nullptr;
 
       const bool isExcerpt = !cs->isMaster();
-      const int startStaff = (isExcerpt || state.startStaff() < 0) ? 0 : state.startStaff();
-      const int endStaff = (isExcerpt || state.endStaff() < 0) ? (cs->nstaves() - 1) : state.endStaff();
+      const int maxStaff = cs->nstaves() - 1;
+      const int startStaff = (isExcerpt || state.startStaff() < 0) ? 0 : min(state.startStaff(), maxStaff);
+      const int endStaff = (isExcerpt || state.endStaff() < 0) ? maxStaff : min(state.endStaff(), maxStaff);
 
       for (Measure* m = mStart; m && m != mEnd; m = m->nextMeasureMM()) {
             for (int st = startStaff; st <= endStaff; ++st) {
