@@ -17,6 +17,6 @@ set(PIANOROLL_SRC
     ${CMAKE_CURRENT_LIST_DIR}/pianoview.h
     )
 
-set(MSCORE_MIXER_UI
+set(PIANOROLL_UI
     ${CMAKE_CURRENT_LIST_DIR}/pianolevelschooser.ui
     )

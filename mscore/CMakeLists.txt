@@ -93,6 +93,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cloud/cloud.cmake)
 
 QT5_WRAP_UI (ui_headers
       ${MSCORE_MIXER_UI}
+      ${PIANOROLL_UI}
       ${CLOUD_UI}
       insertmeasuresdialog.ui editinstrument.ui editstyle.ui instrdialog.ui instrwidget.ui
       measuresdialog.ui pagesettings.ui parteditbase.ui
