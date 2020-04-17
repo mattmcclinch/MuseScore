@@ -109,7 +109,7 @@ QT5_WRAP_UI (ui_headers
       note_groups.ui resourceManager.ui stafftypetemplates.ui
       startcenter.ui scorePreview.ui scoreBrowser.ui templateBrowser.ui
       breaksdialog.ui
-      toolbarEditor.ui workspacedialog.ui
+      toolbarEditor.ui workspacedialog.ui notetweakerdialog.ui
 
       importmidi_ui/importmidi_panel.ui
 
@@ -297,7 +297,7 @@ add_library(mscoreapp STATIC
       keycanvas.h keyedit.h layer.h licence.h
       magbox.h masterpalette.h
       measureproperties.h mediadialog.h metaedit.h miconengine.h
-      musescore.h navigator.h newwizard.h noteGroups.h
+      musescore.h navigator.h newwizard.h noteGroups.h notetweakerdialog.h
       omrpanel.h pagesettings.h palette.h partedit.h parteditbase.h
       pathlistdialog.h piano.h  pianotools.h
       playpanel.h preferences.h preferenceslistwidget.h prefsdialog.h
@@ -329,6 +329,7 @@ add_library(mscoreapp STATIC
       timesigproperties.cpp newwizard.cpp transposedialog.cpp
       excerptsdialog.cpp metaedit.cpp magbox.cpp realizeharmonydialog.cpp
       exportaudio.cpp
+      notetweakerdialog.cpp
       synthcontrol.cpp drumroll.cpp piano.cpp
       drumview.cpp scoretab.cpp keyedit.cpp harmonyedit.cpp
       updatechecker.cpp
