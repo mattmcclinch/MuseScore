@@ -925,7 +925,13 @@ int Staff::channel(const Fraction& tick,  int voice) const
       if (i == _channelList[voice].begin())
             return 0;
       --i;
-      return i.value();
+      int idx = i.value();
+      int max = part()->instrument(tick)->channel().size() - 1;
+      if (idx > max) {
+            qDebug() << "Channel " << idx << " too high. Max " << max;
+            idx = 0;
+            }
+      return idx;
       }
 
 //---------------------------------------------------------
