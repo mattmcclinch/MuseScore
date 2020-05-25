@@ -1558,6 +1558,10 @@ void Score::upDown(bool up, UpDownMode mode)
                                     oNote->undoChangeProperty(Pid::FRET, fret);
                                     }
                                     break;
+
+                              case UpDownMode::ACCIDENTAL:
+                                    // does not apply in this context
+                                    break;
                               }
                         }
                         break;
@@ -1611,6 +1615,17 @@ void Score::upDown(bool up, UpDownMode mode)
                                                 }
                                           }
                                     }
+                                    break;
+
+                              case UpDownMode::ACCIDENTAL:
+                                    pitch += (up ? 1 : -1);
+                                    if (pitchIsValid(pitch)) {
+                                          int tpc = oNote->tpc() + (up ? TPC_DELTA_SEMITONE : -TPC_DELTA_SEMITONE);
+                                          if (tpcIsValid(tpc)) {
+                                                newPitch = pitch;
+                                                setTpc(oNote, tpc, newTpc1, newTpc2);
+                                                }
+                                          }
                                     break;
                               }
                         break;
@@ -3446,7 +3461,7 @@ void Score::cmdRemoveEmptyTrailingMeasures()
 //   cmdPitchUp
 //---------------------------------------------------------
 
-void Score::cmdPitchUp()
+void Score::cmdPitchUp(UpDownMode mode)
       {
       Element* el = selection().element();
       if (el && el->isLyrics())
@@ -3456,14 +3471,14 @@ void Score::cmdPitchUp()
       else if (el && el->isRest())
             cmdMoveRest(toRest(el), Direction::UP);
       else
-            upDown(true, UpDownMode::CHROMATIC);
+            upDown(true, mode);
       }
 
 //---------------------------------------------------------
 //   cmdPitchDown
 //---------------------------------------------------------
 
-void Score::cmdPitchDown()
+void Score::cmdPitchDown(UpDownMode mode)
       {
       Element* el = selection().element();
       if (el && el->isLyrics())
@@ -3473,7 +3488,7 @@ void Score::cmdPitchDown()
       else if (el && el->isRest())
             cmdMoveRest(toRest(el), Direction::DOWN);
       else
-            upDown(false, UpDownMode::CHROMATIC);
+            upDown(false, mode);
       }
 
 //---------------------------------------------------------
@@ -4138,8 +4153,10 @@ void Score::cmd(const QAction* a, EditData& ed)
             { "delete",                     [](Score* cs, EditData&){ cs->cmdDeleteSelection();                                       }},
             { "full-measure-rest",          [](Score* cs, EditData&){ cs->cmdFullMeasureRest();                                       }},
             { "toggle-insert-mode",         [](Score* cs, EditData&){ cs->_is.setInsertMode(!cs->_is.insertMode());                       }},
-            { "pitch-up",                   [](Score* cs, EditData&){ cs->cmdPitchUp();                                               }},
-            { "pitch-down",                 [](Score* cs, EditData&){ cs->cmdPitchDown();                                             }},
+            { "pitch-up",                   [](Score* cs, EditData&){ cs->cmdPitchUp(UpDownMode::CHROMATIC);                          }},
+            { "pitch-down",                 [](Score* cs, EditData&){ cs->cmdPitchDown(UpDownMode::CHROMATIC);                        }},
+            { "pitch-up-accidental",        [](Score* cs, EditData&){ cs->cmdPitchUp(UpDownMode::ACCIDENTAL);                         }},
+            { "pitch-down-accidental",      [](Score* cs, EditData&){ cs->cmdPitchDown(UpDownMode::ACCIDENTAL);                       }},
             { "time-delete",                [](Score* cs, EditData&){ cs->cmdTimeDelete();                                            }},
             { "pitch-up-octave",            [](Score* cs, EditData&){ cs->cmdPitchUpOctave();                                         }},
             { "pitch-down-octave",          [](Score* cs, EditData&){ cs->cmdPitchDownOctave();                                       }},

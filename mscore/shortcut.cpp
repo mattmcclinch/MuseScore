@@ -803,6 +803,16 @@ Shortcut Shortcut::_sc[] = {
          },
       {
          MsWidget::SCORE_TAB,
+         STATE_NORMAL | STATE_NOTE_ENTRY,
+         "pitch-up-accidental",
+         QT_TRANSLATE_NOOP("action","Pitch Up (Accidental)"),
+         QT_TRANSLATE_NOOP("action","Pitch up (accidental)"),
+         0,
+         Icons::Invalid_ICON,
+         Qt::WindowShortcut,
+         },
+      {
+         MsWidget::SCORE_TAB,
          STATE_NORMAL | STATE_NOTE_ENTRY_STAFF_PITCHED | STATE_NOTE_ENTRY_STAFF_DRUM,
          "up-chord",
          QT_TRANSLATE_NOOP("action","Up Note in Chord"),
@@ -863,6 +873,16 @@ Shortcut Shortcut::_sc[] = {
          Icons::Invalid_ICON,
          Qt::WindowShortcut,
          ShortcutFlags::A_CMD
+         },
+      {
+         MsWidget::SCORE_TAB,
+         STATE_NORMAL | STATE_NOTE_ENTRY,
+         "pitch-down-accidental",
+         QT_TRANSLATE_NOOP("action","Pitch Down (Accidental)"),
+         QT_TRANSLATE_NOOP("action","Pitch down (accidental)"),
+         0,
+         Icons::Invalid_ICON,
+         Qt::WindowShortcut,
          },
       {
          MsWidget::SCORE_TAB,
