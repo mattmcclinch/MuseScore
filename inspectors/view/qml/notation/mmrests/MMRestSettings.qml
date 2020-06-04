@@ -8,7 +8,7 @@ PopupViewButton {
 
     property alias model: mmrestPopup.model
 
-    icon: IconNameTypes.QUESTION_MARK
+    icon: IconNameTypes.MULTIMEASURE_REST
     text: qsTr("Multimeasure rests")
 
     visible: root.model ? !root.model.isEmpty : false

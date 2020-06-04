@@ -148,6 +148,7 @@ public:
         BARLINE_UNWINGED = 0xF34D,
 
         CHORD_SYMBOL = 0xF352,
+        MULTIMEASURE_REST = 0xF355,
 
         AUTO,
         NONE,
