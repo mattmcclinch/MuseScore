@@ -151,6 +151,7 @@ public:
         CHORD_SYMBOL = 0xF352,
         GUITAR_BEND = 0xF353,
         GUITAR_TREMOLO_BAR = 0xF355,
+        MULTIMEASURE_REST = 0xF355,
 
         AUTO,
         NONE,
