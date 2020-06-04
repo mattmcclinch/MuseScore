@@ -21,7 +21,8 @@ static const QList<Ms::ElementType> NOTATION_ELEMENT_TYPES = { Ms::ElementType::
                                                                Ms::ElementType::ARTICULATION,
                                                                Ms::ElementType::IMAGE, Ms::ElementType::HARMONY,
                                                                Ms::ElementType::AMBITUS, Ms::ElementType::BRACKET,
-                                                               Ms::ElementType::TIMESIG
+                                                               Ms::ElementType::TIMESIG,
+                                                               Ms::ElementType::MMREST,
 };
 
 static const QList<Ms::ElementType> TEXT_ELEMENT_TYPES = { Ms::ElementType::TEXT, Ms::ElementType::TEXTLINE,

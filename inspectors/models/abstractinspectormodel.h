@@ -64,7 +64,8 @@ public:
         TYPE_CHORD_SYMBOL,
         TYPE_BRACKET,
         TYPE_BRACE,
-        TYPE_TIME_SIGNATURE
+        TYPE_TIME_SIGNATURE,
+        TYPE_MMREST,
     };
 
     explicit AbstractInspectorModel(QObject* parent, IElementRepositoryService* repository = nullptr);
