@@ -1645,7 +1645,7 @@ void ScoreView::constraintCanvas (int* dxx, int* dyy)
                               }
                         }
                   }
-            else { // move left, dx < 0
+            else if (dx < 0) { // move left
                   if (toPagesRect.left() < rect.left() && toPagesRect.right() < rect.right()) {
                         if (pagesRect.width() <= rect.width()) {
                               dx = rect.left() - pagesRect.left();
@@ -1682,7 +1682,7 @@ void ScoreView::constraintCanvas (int* dxx, int* dyy)
                               }
                         }
                   }
-            else { // move up, dy < 0
+            else if (dy < 0) { // move up
                   if (toPagesRect.top() < rect.top() && toPagesRect.bottom() < rect.bottom()) {
                         if (pagesRect.height() <= rect.height()) {
                               dy = rect.top() - pagesRect.top();
