@@ -157,7 +157,7 @@ void MMRest::layout()
     // set clickable area
     if (score()->styleB(Sid::oldStyleMultiMeasureRests)) {
         setbbox(QRectF((m_width - m_symsWidth) * .5, -1.0, m_symsWidth, 2.0));
-    } else { // H-bar}
+    } else { // H-bar
         qreal vStrokeHeight = score()->styleP(Sid::mmRestHBarVStrokeHeight);
         setbbox(QRectF(0.0, -(vStrokeHeight * .5), m_width, vStrokeHeight));
     }
@@ -187,7 +187,7 @@ QRectF MMRest::numberRect() const
 
 void MMRest::write(XmlWriter& xml) const
 {
-    xml.stag("Rest");
+    xml.stag("Rest"); // for compatibility, see also Measure::readVoice()
     ChordRest::writeProperties(xml);
     el().write(xml);
     xml.etag();
@@ -205,16 +205,6 @@ QVariant MMRest::propertyDefault(Pid propertyId) const
         default:
             return Rest::propertyDefault(propertyId);
     }
-}
-
-//---------------------------------------------------------
-//   resetProperty
-//---------------------------------------------------------
-
-void MMRest::resetProperty(Pid propertyId)
-{
-    setProperty(propertyId, propertyDefault(propertyId));
-    return;
 }
 
 //---------------------------------------------------------

@@ -42,7 +42,6 @@ public:
     void write(XmlWriter&) const override;
 
     QVariant propertyDefault(Pid) const override;
-    void resetProperty(Pid);
     bool setProperty(Pid, const QVariant&) override;
     QVariant getProperty(Pid) const override;
 
