@@ -2821,7 +2821,7 @@ public:
 
     qreal height(SymId id, qreal mag) const { return bbox(id, mag).height(); }
     qreal width(SymId id, qreal mag) const { return bbox(id, mag).width(); }
-    qreal advance(SymId id, qreal mag) const;
+    qreal advance(SymId id, qreal mag, qreal space = 0) const;
     qreal width(const std::vector<SymId>&, qreal mag) const;
 
     const QRectF bbox(SymId id, const QSizeF&) const;

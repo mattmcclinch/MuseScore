@@ -23,7 +23,7 @@ static const ElementStyle mmRestStyle {
     { Sid::mmRestNumberPos, Pid::MMREST_NUMBER_POS },
 };
 
-const qreal SPACING = 1.5;
+const qreal SPACING = 0.75;
 
 //---------------------------------------------------------
 //    MMRest
@@ -147,11 +147,11 @@ void MMRest::layout()
             m_isOddNumber = true;
             // whole rest not added to m_restSyms, drawn separately due to need for vertical offset
             m_symsWidth += symBbox(SymId::restWhole).width();
-            m_symsWidth += score()->scoreFont()->sym(sym).advance() * SPACING;
+            m_symsWidth += spatium() * SPACING;
         } else {
             m_isOddNumber = false;
         }
-        m_symsWidth += score()->scoreFont()->sym(sym).advance() * SPACING * (m_restSyms.size() - 1);
+        m_symsWidth += spatium() * SPACING * (m_restSyms.size() - 1);
     }
 
     // set clickable area
