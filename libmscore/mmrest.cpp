@@ -23,8 +23,6 @@ static const ElementStyle mmRestStyle {
     { Sid::mmRestNumberPos, Pid::MMREST_NUMBER_POS },
 };
 
-const qreal SPACING = 0.75;
-
 //---------------------------------------------------------
 //    MMRest
 //--------------------------------------------------------
@@ -73,7 +71,8 @@ void MMRest::draw(QPainter* painter) const
     if (score()->styleB(Sid::oldStyleMultiMeasureRests)
       && m_number <= score()->styleI(Sid::mmRestOldStyleMaxMeasures)) {
         x = (m_width - m_symsWidth) * 0.5;
-        drawSymbols(m_restSyms, painter, QPointF(x, 0), 1.0, SPACING);
+        qreal spacing = score()->styleP(Sid::mmRestOldStyleSpacing);
+        drawSymbols(m_restSyms, painter, QPointF(x, 0), 1.0, spacing);
         if (m_isOddNumber) {
             // add the whole rest separately, because otherwise it would draw too low
             SymId sym = SymId::restWhole;
@@ -107,7 +106,7 @@ void MMRest::draw(QPainter* painter) const
             painter->setPen(pen);
             qreal halfVStrokeHeight = score()->styleP(Sid::mmRestHBarVStrokeHeight) * .5;
             painter->drawLine(QLineF(0.0, -halfVStrokeHeight, 0.0, halfVStrokeHeight));
-            painter->drawLine(QLineF(m_width, -halfVStrokeHeight, m_width,  halfVStrokeHeight));
+            painter->drawLine(QLineF(m_width, -halfVStrokeHeight, m_width, halfVStrokeHeight));
         }
     }
 }
@@ -129,6 +128,7 @@ void MMRest::layout()
         m_symsWidth = 0;
 
         int counter = m_number;
+        qreal spacing = score()->styleP(Sid::mmRestOldStyleSpacing);
         SymId sym;
 
         while (counter >= 4) {
@@ -147,16 +147,17 @@ void MMRest::layout()
             m_isOddNumber = true;
             // whole rest not added to m_restSyms, drawn separately due to need for vertical offset
             m_symsWidth += symBbox(SymId::restWhole).width();
-            m_symsWidth += spatium() * SPACING;
+            m_symsWidth += spacing;
         } else {
             m_isOddNumber = false;
         }
-        m_symsWidth += spatium() * SPACING * (m_restSyms.size() - 1);
+        m_symsWidth += spacing * (m_restSyms.size() - 1);
     }
 
     // set clickable area
     if (score()->styleB(Sid::oldStyleMultiMeasureRests)) {
-        setbbox(QRectF((m_width - m_symsWidth) * .5, -1.0, m_symsWidth, 2.0));
+        qreal symHeight = symBbox(m_number <= 3 ? SymId::restDoubleWhole : SymId::restLonga).height();
+        setbbox(QRectF((m_width - m_symsWidth) * .5, -spatium(), m_symsWidth, symHeight));
     } else { // H-bar
         qreal vStrokeHeight = score()->styleP(Sid::mmRestHBarVStrokeHeight);
         setbbox(QRectF(0.0, -(vStrokeHeight * .5), m_width, vStrokeHeight));

@@ -395,6 +395,7 @@ enum class Sid {
     mmRestHBarVStrokeHeight,
     oldStyleMultiMeasureRests,
     mmRestOldStyleMaxMeasures,
+    mmRestOldStyleSpacing,
     hideEmptyStaves,
     dontHideStavesInFirstSystem,
     alwaysShowBracketsWhenEmptyStavesAreHidden,

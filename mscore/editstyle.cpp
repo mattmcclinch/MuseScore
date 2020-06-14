@@ -171,6 +171,7 @@ EditStyle::EditStyle(Score* s, QWidget* parent)
         { Sid::mmRestHBarVStrokeHeight, false, mmRestHBarVStrokeHeight, resetMMRestHBarVStrokeHeight },
         { Sid::oldStyleMultiMeasureRests, false, oldStyleMultiMeasureRests, 0 },
         { Sid::mmRestOldStyleMaxMeasures, false, mmRestOldStyleMaxMeasures, resetMMRestOldStyleMaxMeasures },
+        { Sid::mmRestOldStyleSpacing,   false, mmRestOldStyleSpacing,   resetMMRestOldStyleSpacing },
         { Sid::hideEmptyStaves,         false, hideEmptyStaves,         0 },
         { Sid::dontHideStavesInFirstSystem, false, dontHideStavesInFirstSystem, 0 },
         { Sid::alwaysShowBracketsWhenEmptyStavesAreHidden, false, alwaysShowBrackets, 0 },

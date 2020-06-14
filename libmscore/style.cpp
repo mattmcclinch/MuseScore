@@ -408,6 +408,7 @@ static const StyleType styleTypes[] {
     { Sid::mmRestHBarVStrokeHeight, "mmRestHBarVStrokeHeight", Spatium(2.0) },
     { Sid::oldStyleMultiMeasureRests, "oldStyleMultiMeasureRests", QVariant(false) },
     { Sid::mmRestOldStyleMaxMeasures, "mmRestOldStyleMaxMeasures", QVariant(9) },
+    { Sid::mmRestOldStyleSpacing,   "mmRestOldStyleSpacing",   Spatium(0.85) },
     { Sid::hideEmptyStaves,         "hideEmptyStaves",         QVariant(false) },
     { Sid::dontHideStavesInFirstSystem,
       "dontHidStavesInFirstSystm",    QVariant(true) },
