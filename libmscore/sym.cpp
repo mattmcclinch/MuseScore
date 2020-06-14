@@ -5805,12 +5805,12 @@ void ScoreFont::draw(SymId id, QPainter* painter, qreal mag, const QPointF& pos,
     draw(d, painter, mag, pos);
 }
 
-void ScoreFont::draw(const std::vector<SymId>& ids, QPainter* p, qreal mag, const QPointF& _pos, qreal scale) const
+void ScoreFont::draw(const std::vector<SymId>& ids, QPainter* p, qreal mag, const QPointF& _pos, qreal scale, qreal space) const
 {
     QPointF pos(_pos);
     for (SymId id : ids) {
         draw(id, p, mag, pos, scale);
-        pos.rx() += advance(id, mag);
+        pos.rx() += advance(id, mag + space);
     }
 }
 

@@ -1575,9 +1575,9 @@ void Element::drawSymbol(SymId id, QPainter* p, const QPointF& o, int n) const
     score()->scoreFont()->draw(id, p, magS(), o, n);
 }
 
-void Element::drawSymbols(const std::vector<SymId>& s, QPainter* p, const QPointF& o, qreal scale) const
+void Element::drawSymbols(const std::vector<SymId>& s, QPainter* p, const QPointF& o, qreal scale, qreal space) const
 {
-    score()->scoreFont()->draw(s, p, magS() * scale, o);
+    score()->scoreFont()->draw(s, p, magS() * scale, o, p->worldTransform().m11(), magS() * space);
 }
 
 void Element::drawSymbols(const std::vector<SymId>& s, QPainter* p, const QPointF& o, const QSizeF& scale) const

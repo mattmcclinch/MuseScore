@@ -2816,7 +2816,7 @@ public:
     void draw(SymId id,                  QPainter*, qreal mag,         const QPointF& pos, int n) const;
     void draw(const std::vector<SymId>&, QPainter*, qreal mag,         const QPointF& pos) const;
     void draw(const std::vector<SymId>&, QPainter*, const QSizeF& mag, const QPointF& pos) const;
-    void draw(const std::vector<SymId>&, QPainter*, qreal mag,         const QPointF& pos, qreal scale) const;
+    void draw(const std::vector<SymId>&, QPainter*, qreal mag,         const QPointF& pos, qreal scale, qreal space = 0) const;
     void draw(const std::vector<SymId>&, QPainter*, const QSizeF& mag, const QPointF& pos, qreal scale) const;
 
     qreal height(SymId id, qreal mag) const { return bbox(id, mag).height(); }
