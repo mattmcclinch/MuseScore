@@ -70,15 +70,21 @@ void MMRest::draw(QPainter* painter) const
 
     if (score()->styleB(Sid::oldStyleMultiMeasureRests)
       && m_number <= score()->styleI(Sid::mmRestOldStyleMaxMeasures)) {
+        // draw rest symbols
         x = (m_width - m_symsWidth) * 0.5;
         qreal spacing = score()->styleP(Sid::mmRestOldStyleSpacing);
         drawSymbols(m_restSyms, painter, QPointF(x, 0), 1.0, spacing);
         if (m_isOddNumber) {
             // add the whole rest separately, because otherwise it would draw too low
             SymId sym = SymId::restWhole;
-            x += m_symsWidth;
-            x -= symBbox(sym).width();
-            drawSymbol(sym, painter, QPointF(x, -_spatium));
+            if (m_restSyms.empty()) { // only one measure
+                x -= symBbox(sym).width() * .5;
+            } else {
+                x += m_symsWidth;
+                x -= symBbox(sym).width();
+            }
+            y = -spatium();
+            drawSymbol(sym, painter, QPointF(x, y));
         }
     } else {
         // draw horizontal line
@@ -88,7 +94,7 @@ void MMRest::draw(QPainter* painter) const
         pen.setCapStyle(Qt::FlatCap);
         pen.setWidthF(hBarThickness);
         painter->setPen(pen);
-        if (score()->styleB(Sid::mmRestNumberMaskHBar)     // avoid painting line through number
+        if (score()->styleB(Sid::mmRestNumberMaskHBar) // avoid painting line through number
           && (y + (numberBox.height() * .5)) > -halfHBarThickness
           && (y - (numberBox.height() * .5)) < halfHBarThickness) {
             qreal gapDistance = (numberBox.width() + _spatium) * .5;
@@ -146,17 +152,33 @@ void MMRest::layout()
         if (counter == 1) {
             m_isOddNumber = true;
             // whole rest not added to m_restSyms, drawn separately due to need for vertical offset
-            m_symsWidth += symBbox(SymId::restWhole).width();
-            m_symsWidth += spacing;
+            if (!m_restSyms.empty()) {
+                m_symsWidth += symBbox(SymId::restWhole).width();
+                m_symsWidth += spacing;
+            }
         } else {
             m_isOddNumber = false;
         }
-        m_symsWidth += spacing * (m_restSyms.size() - 1);
+        if (!m_restSyms.empty()) {
+            m_symsWidth += spacing * (m_restSyms.size() - 1);
+        }
     }
 
     // set clickable area
     if (score()->styleB(Sid::oldStyleMultiMeasureRests)) {
-        qreal symHeight = symBbox(m_number <= 3 ? SymId::restDoubleWhole : SymId::restLonga).height();
+        qreal symHeight;
+        switch (m_number) {
+        case 1:
+            symHeight = symBbox(SymId::restWhole).height();
+            break;
+        case 2: // fallthrough
+        case 3:
+            symHeight = symBbox(SymId::restDoubleWhole).height();
+            break;
+        default:
+            symHeight = symBbox(SymId::restLonga).height();
+            break;
+        }
         setbbox(QRectF((m_width - m_symsWidth) * .5, -spatium(), m_symsWidth, symHeight));
     } else { // H-bar
         qreal vStrokeHeight = score()->styleP(Sid::mmRestHBarVStrokeHeight);
