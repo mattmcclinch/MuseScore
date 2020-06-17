@@ -1,7 +1,7 @@
 #include "mmrestsettingsmodel.h"
 
-MMRestSettingsModel::MMRestSettingsModel(QObject* parent, IElementRepositoryService* repository) :
-    AbstractInspectorModel(parent, repository)
+MMRestSettingsModel::MMRestSettingsModel(QObject* parent, IElementRepositoryService* repository)
+    : AbstractInspectorModel(parent, repository)
 {
     setModelType(TYPE_MMREST);
     setTitle(tr("Multimeasure rest"));
@@ -10,6 +10,7 @@ MMRestSettingsModel::MMRestSettingsModel(QObject* parent, IElementRepositoryServ
 
 void MMRestSettingsModel::createProperties()
 {
+    m_isNumberVisible = buildPropertyItem(Ms::Pid::MMREST_NUMBER_VISIBLE);
     m_numberPosition = buildPropertyItem(Ms::Pid::MMREST_NUMBER_POS);
 }
 
@@ -20,12 +21,19 @@ void MMRestSettingsModel::requestElements()
 
 void MMRestSettingsModel::loadProperties()
 {
+    loadPropertyItem(m_isNumberVisible);
     loadPropertyItem(m_numberPosition);
 }
 
 void MMRestSettingsModel::resetProperties()
 {
+    m_isNumberVisible->resetToDefault();
     m_numberPosition->resetToDefault();
+}
+
+PropertyItem* MMRestSettingsModel::isNumberVisible() const
+{
+    return m_isNumberVisible;
 }
 
 PropertyItem* MMRestSettingsModel::numberPosition() const

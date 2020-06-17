@@ -7,6 +7,7 @@ class MMRestSettingsModel : public AbstractInspectorModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(PropertyItem* isNumberVisible READ isNumberVisible CONSTANT)
     Q_PROPERTY(PropertyItem* numberPosition READ numberPosition CONSTANT)
 
 public:
@@ -17,9 +18,11 @@ public:
     void loadProperties() override;
     void resetProperties() override;
 
+    PropertyItem* isNumberVisible() const;
     PropertyItem* numberPosition() const;
 
 private:
+    PropertyItem* m_isNumberVisible = nullptr;
     PropertyItem* m_numberPosition = nullptr;
 };
 

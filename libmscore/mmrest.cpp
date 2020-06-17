@@ -32,6 +32,7 @@ MMRest::MMRest(Score* s)
 {
     m_width = 0;
     m_symsWidth = 0;
+    m_numberVisible = true;
     if (score()) {
         initElementStyle(&mmRestStyle);
     }
@@ -46,6 +47,7 @@ MMRest::MMRest(const MMRest& r, bool link)
     }
     m_width = r.m_width;
     m_symsWidth = r.m_symsWidth;
+    m_numberVisible = r.m_numberVisible;
 }
 
 //---------------------------------------------------------
@@ -66,7 +68,9 @@ void MMRest::draw(QPainter* painter) const
     QRectF numberBox = symBbox(numberSym);
     qreal x = (m_width - numberBox.width()) * .5;
     qreal y = m_numberPos * spatium() - staff()->height() * .5;
-    drawSymbols(numberSym, painter, QPointF(x, y));
+    if (m_numberVisible) {
+        drawSymbols(numberSym, painter, QPointF(x, y));
+    }
 
     if (score()->styleB(Sid::oldStyleMultiMeasureRests)
       && m_number <= score()->styleI(Sid::mmRestOldStyleMaxMeasures)) {
@@ -184,7 +188,9 @@ void MMRest::layout()
         qreal vStrokeHeight = score()->styleP(Sid::mmRestHBarVStrokeHeight);
         setbbox(QRectF(0.0, -(vStrokeHeight * .5), m_width, vStrokeHeight));
     }
-    addbbox(numberRect());
+    if (m_numberVisible) {
+        addbbox(numberRect());
+    }
 }
 
 //---------------------------------------------------------
@@ -225,6 +231,8 @@ QVariant MMRest::propertyDefault(Pid propertyId) const
     switch (propertyId) {
         case Pid::MMREST_NUMBER_POS:
             return score()->styleV(Sid::mmRestNumberPos);
+        case Pid::MMREST_NUMBER_VISIBLE:
+            return true;
         default:
             return Rest::propertyDefault(propertyId);
     }
@@ -239,6 +247,8 @@ QVariant MMRest::getProperty(Pid propertyId) const
     switch (propertyId) {
         case Pid::MMREST_NUMBER_POS:
             return m_numberPos;
+        case Pid::MMREST_NUMBER_VISIBLE:
+            return m_numberVisible;
         default:
             return Rest::getProperty(propertyId);
     }
@@ -253,6 +263,10 @@ bool MMRest::setProperty(Pid propertyId, const QVariant& v)
     switch (propertyId) {
         case Pid::MMREST_NUMBER_POS:
             m_numberPos = v.toDouble();
+            triggerLayout();
+            break;
+        case Pid::MMREST_NUMBER_VISIBLE:
+            m_numberVisible = v.toBool();
             triggerLayout();
             break;
         default:
@@ -270,7 +284,9 @@ Shape MMRest::shape() const
     Shape shape;
     qreal vStrokeHeight = score()->styleP(Sid::mmRestHBarVStrokeHeight);
     shape.add(QRectF(0.0, -(vStrokeHeight * .5), m_width, vStrokeHeight));
-    shape.add(numberRect());
+    if (m_numberVisible) {
+        shape.add(numberRect());
+    }
     return shape;
 }
 

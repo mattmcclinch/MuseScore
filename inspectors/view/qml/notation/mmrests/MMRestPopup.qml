@@ -26,33 +26,56 @@ StyledPopup {
             height: childrenRect.height
             width: parent.width
 
-            StyledTextLabel {
-                anchors.left: parent.left
-                text: qsTr("Number position")
-            }
-
             Item {
                 height: childrenRect.height
                 width: parent.width
 
-                IncrementalPropertyControl {
-                    id: numberPositionControl
-
+                Column {
                     anchors.left: parent.left
                     anchors.right: parent.horizontalCenter
                     anchors.rightMargin: 2
 
-                    icon: IconCode.VERTICAL
-                    isIndeterminate: root.model ? root.model.numberPosition.isUndefined : false
-                    currentValue: root.model ? root.model.numberPosition.value : 0
+                    spacing: 8
 
-                    measureUnitsSymbol: "sp"
-                    step: 0.5
-                    decimals: 2
-                    maxValue: 99.00
-                    minValue: -99.00
+                    CheckBox {
+                        id: numberVisibilityCheckBox
 
-                    onValueEdited: { root.model.numberPosition.value = newValue }
+                        isIndeterminate: root.model ? root.model.isNumberVisible.isUndefined : false
+                        checked: root.model && !isIndeterminate ? root.model.isNumberVisible.value : false
+                        text: qsTr("Number visible")
+
+                        onClicked: { root.model.isNumberVisible.value = !checked }
+                    }
+                }
+
+                Column {
+                    anchors.left: parent.horizontalCenter
+                    anchors.leftMargin: 2
+                    anchors.right: parent.right
+
+                    spacing: 8
+
+                    StyledTextLabel {
+                        text: qsTr("Number position")
+                    }
+
+
+                    IncrementalPropertyControl {
+                        id: numberPositionControl
+
+                        icon: IconCode.VERTICAL
+                        enabled: root.model ? model.isEmpty || numberVisibilityCheckBox.checked : true
+                        isIndeterminate: root.model ? root.model.numberPosition.isUndefined : false
+                        currentValue: root.model ? root.model.numberPosition.value : 0
+
+                        measureUnitsSymbol: "sp"
+                        step: 0.5
+                        decimals: 2
+                        maxValue: 99.00
+                        minValue: -99.00
+
+                        onValueEdited: { root.model.numberPosition.value = newValue }
+                    }
                 }
             }
         }
