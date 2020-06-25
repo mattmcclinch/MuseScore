@@ -77,18 +77,10 @@ void MMRest::draw(QPainter* painter) const
         // draw rest symbols
         x = (m_width - m_symsWidth) * 0.5;
         qreal spacing = score()->styleP(Sid::mmRestOldStyleSpacing);
-        drawSymbols(m_restSyms, painter, QPointF(x, 0), 1.0, spacing);
-        if (m_number % 2) { // odd number means last symbol is a whole rest
-            // add the whole rest separately, because otherwise it would draw too low
-            SymId sym = SymId::restWhole;
-            if (m_restSyms.empty()) { // only one measure
-                x -= symBbox(sym).width() * .5;
-            } else {
-                x += m_symsWidth;
-                x -= symBbox(sym).width();
-            }
-            y = -spatium();
+        for (SymId sym : m_restSyms) {
+            y = (sym == SymId::restWhole ? -spatium() : 0);
             drawSymbol(sym, painter, QPointF(x, y));
+            x += symBbox(sym).width() + spacing;
         }
     } else {
         // draw horizontal line
@@ -137,53 +129,29 @@ void MMRest::layout()
         m_restSyms.clear();
         m_symsWidth = 0;
 
-        int counter = m_number;
+        int remaining = m_number;
         qreal spacing = score()->styleP(Sid::mmRestOldStyleSpacing);
         SymId sym;
 
-        while (counter >= 4) {
-            sym = SymId::restLonga;
+        while (remaining > 0) {
+            if (remaining >= 4) {
+                sym = SymId::restLonga;
+                remaining -= 4;
+            } else if (remaining >= 2) {
+                sym = SymId::restDoubleWhole;
+                remaining -= 2;
+            } else {
+                sym = SymId::restWhole;
+                remaining -= 1;
+            }
             m_restSyms.push_back(sym);
-            counter -= 4;
             m_symsWidth += symBbox(sym).width();
-        }
-        while (counter >= 2) {
-            sym = SymId::restDoubleWhole;
-            m_restSyms.push_back(sym);
-            counter -= 2;
-            m_symsWidth += symBbox(sym).width();
-        }
-        if (!m_restSyms.empty()) {
-            m_symsWidth += spacing * (m_restSyms.size() - 1);
-            if (counter == 1) { // odd number means last symbol is a whole rest
-                m_symsWidth += symBbox(SymId::restWhole).width();
+            if (remaining > 0) {
                 m_symsWidth += spacing;
             }
         }
-    }
-
-    // set clickable area
-    if (score()->styleB(Sid::oldStyleMultiMeasureRests)) {
-        SymId sym;
-        switch (m_number) {
-        case 1:
-            sym = SymId::restWhole;
-            break;
-        case 2: // fallthrough
-        case 3:
-            sym = SymId::restDoubleWhole;
-            break;
-        default:
-            sym = SymId::restLonga;
-            break;
-        }
-        qreal symHeight = symBbox(sym).height();
-        if (m_symsWidth) {
-            setbbox(QRectF((m_width - m_symsWidth) * .5, -spatium(), m_symsWidth, symHeight));
-        } else { // 1-measure rest, still needs some nonzero bbox
-            qreal w = symBbox(sym).width();
-            setbbox(QRectF((m_width - w) * .5, -spatium(), w, symHeight));
-        }
+        qreal symHeight = symBbox(m_restSyms[0]).height();
+        setbbox(QRectF((m_width - m_symsWidth) * .5, -spatium(), m_symsWidth, symHeight));
     } else { // H-bar
         qreal vStrokeHeight = score()->styleP(Sid::mmRestHBarVStrokeHeight);
         setbbox(QRectF(0.0, -(vStrokeHeight * .5), m_width, vStrokeHeight));
