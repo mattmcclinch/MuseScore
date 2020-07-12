@@ -726,6 +726,9 @@ void Chord::addLedgerLines()
     qreal lineDistance = 1;
     qreal mag         = 1;
     bool staffVisible  = true;
+    
+    qreal yoffset = 0.0; //for staff changes
+    int stepOffset = 0;
 
     if (segment()) {   //not palette
         Fraction tick = segment()->tick();
@@ -736,13 +739,16 @@ void Chord::addLedgerLines()
         lineDistance  = st->lineDistance(tick);
         mag           = staff()->staffMag(tick);
         staffVisible  = !staff()->invisible();
+
+        yoffset       = st->yoffset(tick); 
+        stepOffset    = st->stepOffset(tick); 
     }
 
-    // need ledger lines?
-    if (downLine() <= lineBelow + 1 && upLine() >= -1) {
+    // need ledger lines? (consider stepOffset for staff changes)    
+    if (downLine()+stepOffset <= lineBelow + 1 && upLine()+stepOffset >= -1) {
         return;
     }
-
+    
     // the extra length of a ledger line with respect to notehead (half of it on each side)
     qreal extraLen = score()->styleP(Sid::ledgerLineLength) * mag * 0.5;
     qreal hw;
@@ -772,7 +778,7 @@ void Chord::addLedgerLines()
         }
         for (int i = from; i < int(n) && i >= 0; i += delta) {
             Note* note = _notes.at(i);
-            int l = note->line();
+            int l = note->line() + stepOffset;   
 
             // if 1st pass and note not below staff or 2nd pass and note not above staff
             if ((!j && l <= lineBelow + 1) || (j && l >= -1)) {
@@ -859,13 +865,14 @@ void Chord::addLedgerLines()
         if (minLine < 0 || maxLine > lineBelow) {
             qreal _spatium = spatium();
             qreal stepDistance = 0.5;           // staff() ? staff()->lineDistance() * 0.5 : 0.5;
+
             for (auto lld : vecLines) {
                 LedgerLine* h = new LedgerLine(score());
                 h->setParent(this);
                 h->setTrack(track);
                 h->setVisible(lld.visible && staffVisible);
                 h->setLen(lld.maxX - lld.minX);
-                h->setPos(lld.minX, lld.line * _spatium * stepDistance);
+                h->setPos(lld.minX, (lld.line * _spatium * stepDistance) + yoffset * _spatium);
                 h->setNext(_ledgerLines);
                 _ledgerLines = h;
             }
