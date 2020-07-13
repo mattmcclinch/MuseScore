@@ -1584,23 +1584,4 @@ qreal Staff::lineDistance(const Fraction& tick) const
 {
     return staffType(tick)->lineDistance().val();
 }
-
-//---------------------------------------------------------
-// yoffset (for staff changes)
-//---------------------------------------------------------
-
-qreal Staff::yoffset(const Fraction& tick) const
-{
-    return staffType(tick)->yoffset().val();
-}
-
-//---------------------------------------------------------
-//stepOffset (for staff changes)
-//---------------------------------------------------------
-
-int Staff::stepOffset(const Fraction& tick) const
-{
-    return staffType(tick)->stepOffset();
-}
-
 }

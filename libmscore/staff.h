@@ -233,9 +233,6 @@ private:
     qreal staffMag(const Element* element) const;
     qreal spatium(const Fraction&) const;
     qreal spatium(const Element*) const;
-
-    qreal yoffset(const Fraction&) const;
-    int stepOffset(const Fraction&) const;
     //===========
 
     ChangeMap& velocities() { return _velocities; }

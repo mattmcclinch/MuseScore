@@ -726,7 +726,7 @@ void Chord::addLedgerLines()
     qreal lineDistance = 1;
     qreal mag         = 1;
     bool staffVisible  = true;
-    
+
     qreal yoffset = 0.0; // for staff changes
     int stepOffset = 0;  // for staff changes
 
@@ -740,15 +740,15 @@ void Chord::addLedgerLines()
         mag           = staff()->staffMag(tick);
         staffVisible  = !staff()->invisible();
 
-        yoffset       = st->yoffset(tick); 
-        stepOffset    = st->stepOffset(tick); 
+        yoffset       = staffType()->yoffset().val();
+        stepOffset    = staffType()->stepOffset();
     }
 
-    // need ledger lines? (add stepOffset for staff changes)    
+    // need ledger lines? (add stepOffset for staff changes)
     if (downLine() + stepOffset <= lineBelow + 1 && upLine() + stepOffset >= -1) {
         return;
     }
-    
+
     // the extra length of a ledger line with respect to notehead (half of it on each side)
     qreal extraLen = score()->styleP(Sid::ledgerLineLength) * mag * 0.5;
     qreal hw;
@@ -778,7 +778,7 @@ void Chord::addLedgerLines()
         }
         for (int i = from; i < int(n) && i >= 0; i += delta) {
             Note* note = _notes.at(i);
-            int l = note->line() + stepOffset;   
+            int l = note->line() + stepOffset;
 
             // if 1st pass and note not below staff or 2nd pass and note not above staff
             if ((!j && l <= lineBelow + 1) || (j && l >= -1)) {
