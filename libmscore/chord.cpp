@@ -727,8 +727,8 @@ void Chord::addLedgerLines()
     qreal mag         = 1;
     bool staffVisible  = true;
     
-    qreal yoffset = 0.0; //for staff changes
-    int stepOffset = 0;
+    qreal yoffset = 0.0; // for staff changes
+    int stepOffset = 0;  // for staff changes
 
     if (segment()) {   //not palette
         Fraction tick = segment()->tick();
@@ -744,8 +744,8 @@ void Chord::addLedgerLines()
         stepOffset    = st->stepOffset(tick); 
     }
 
-    // need ledger lines? (consider stepOffset for staff changes)    
-    if (downLine()+stepOffset <= lineBelow + 1 && upLine()+stepOffset >= -1) {
+    // need ledger lines? (add stepOffset for staff changes)    
+    if (downLine() + stepOffset <= lineBelow + 1 && upLine() + stepOffset >= -1) {
         return;
     }
     
@@ -865,14 +865,13 @@ void Chord::addLedgerLines()
         if (minLine < 0 || maxLine > lineBelow) {
             qreal _spatium = spatium();
             qreal stepDistance = 0.5;           // staff() ? staff()->lineDistance() * 0.5 : 0.5;
-
             for (auto lld : vecLines) {
                 LedgerLine* h = new LedgerLine(score());
                 h->setParent(this);
                 h->setTrack(track);
                 h->setVisible(lld.visible && staffVisible);
                 h->setLen(lld.maxX - lld.minX);
-                h->setPos(lld.minX, (lld.line * _spatium * stepDistance) + yoffset * _spatium);
+                h->setPos(lld.minX, (lld.line * stepDistance + yoffset) * _spatium);
                 h->setNext(_ledgerLines);
                 _ledgerLines = h;
             }
