@@ -135,6 +135,7 @@ EditStyle::EditStyle(Score* s, QWidget* parent)
         { Sid::frameSystemDistance,     false, frameSystemDistance,     resetFrameSystemDistance },
         { Sid::minMeasureWidth,         false, minMeasureWidth_2,       resetMinMeasureWidth },
         { Sid::measureSpacing,          false, measureSpacing,          resetMeasureSpacing },
+        { Sid::measureRepeatNumberPos,  false, measureRepeatNumberPos,  resetMeasureRepeatNumberPos },
         { Sid::fourMeasureRepeatShowExtenders, false, fourMeasureRepeatShowExtenders,
           resetFourMeasureRepeatShowExtenders },
 
@@ -725,6 +726,7 @@ const std::map<ElementType, EditStylePage> EditStyle::PAGES = {
     { ElementType::CLEF,                &EditStyle::PageClefs },
     { ElementType::KEYSIG,              &EditStyle::PageAccidentals },
     { ElementType::MEASURE,             &EditStyle::PageMeasure },
+    { ElementType::MEASURE_REPEAT,      &EditStyle::PageMeasure },
     { ElementType::REST,                &EditStyle::PageRests },
     { ElementType::MMREST,              &EditStyle::PageRests },
     { ElementType::BAR_LINE,            &EditStyle::PageBarlines },

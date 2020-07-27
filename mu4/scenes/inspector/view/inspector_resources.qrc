@@ -155,5 +155,7 @@
         <file>qml/MuseScore/Inspector/qmldir</file>
         <file>qml/MuseScore/Inspector/notation/mmrests/MMRestPopup.qml</file>
         <file>qml/MuseScore/Inspector/notation/mmrests/MMRestSettings.qml</file>
+        <file>qml/MuseScore/Inspector/notation/measurerepeats/MeasureRepeatPopup.qml</file>
+        <file>qml/MuseScore/Inspector/notation/measurerepeats/MeasureRepeatSettings.qml</file>
     </qresource>
 </RCC>

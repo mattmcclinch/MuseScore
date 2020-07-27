@@ -13,8 +13,9 @@
 #ifndef __REPEAT_H__
 #define __REPEAT_H__
 
-#include "text.h"
 #include "rest.h"
+#include "text.h"
+#include "utils.h"
 
 namespace Ms {
 class Score;
@@ -38,8 +39,12 @@ public:
     int numMeasures() const                 { return m_numMeasures; }
     void setSymId(SymId id)                 { m_symId = id; }
     SymId symId() const                     { return m_symId; }
+    void setNumberSym(int n)                { m_numberSym = toTimeSigString(QString::number(n)); }
+    std::vector<SymId> numberSym() const    { return m_numberSym; }
+    void setNumberPos(qreal d)              { m_numberPos = d; }
+    qreal numberPos() const                 { return m_numberPos; }
 
-    Measure* firstMeasureOfGroup() const     { return measure()->firstOfMeasureRepeatGroup(staffIdx()); }
+    Measure* firstMeasureOfGroup() const    { return measure()->firstOfMeasureRepeatGroup(staffIdx()); }
 
     void draw(QPainter*) const override;
     void layout() override;
@@ -49,6 +54,10 @@ public:
     void read(XmlReader&) override;
     void write(XmlWriter& xml) const override;
 
+    QVariant propertyDefault(Pid) const override;
+    bool setProperty(Pid, const QVariant&) override;
+    QVariant getProperty(Pid) const override;
+
     QRectF numberRect() const override;
     Shape shape() const override;
 
@@ -57,7 +66,10 @@ public:
     bool placeMultiple() const override     { return numMeasures() == 1; } // prevent overlapping additions with range selection
 
 private:
+    Sid getPropertyStyle(Pid) const override;
     int m_numMeasures;
+    std::vector<SymId> m_numberSym;
+    qreal m_numberPos;
     SymId m_symId;
 };
 }     // namespace Ms

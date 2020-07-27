@@ -3403,7 +3403,14 @@
            <string>Measure Repeats</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_47">
-           <item row="2" column="0">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_148">
+             <property name="text">
+              <string>Number position:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
             <spacer name="verticalSpacer_11">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -3416,14 +3423,31 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="fourMeasureRepeatShowExtenders">
-             <property name="text">
-              <string>Show extenders on 4-measure repeats</string>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="measureRepeatNumberPos">
+             <property name="suffix">
+              <string>sp</string>
+             </property>
+             <property name="minimum">
+              <double>-99.989999999999995</double>
+             </property>
+             <property name="singleStep">
+              <double>0.500000000000000</double>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
+           <item row="0" column="2">
+            <widget class="QToolButton" name="resetMeasureRepeatNumberPos">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>data/icons/edit-reset.svg</normaloff>data/icons/edit-reset.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
             <widget class="QToolButton" name="resetFourMeasureRepeatShowExtenders">
              <property name="toolTip">
               <string>Reset to default</string>
@@ -3437,6 +3461,13 @@
              <property name="icon">
               <iconset resource="musescore.qrc">
                <normaloff>:/data/icons/edit-reset.svg</normaloff>:/data/icons/edit-reset.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="QCheckBox" name="fourMeasureRepeatShowExtenders">
+             <property name="text">
+              <string>Show extenders on 4-measure repeats</string>
              </property>
             </widget>
            </item>
