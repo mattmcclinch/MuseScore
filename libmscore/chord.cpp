@@ -886,7 +886,7 @@ void Chord::computeUp()
             // if no stems or stem beside staves
             if (tab->stemless() || !tab->stemThrough()) {
                   // if measure has voices, set stem direction according to voice
-                  if (measure()->hasVoices(staffIdx(), tick(), actualTicks()))
+                  if (measure()->hasVoices(staffIdx()))
                         _up = !(track() % 2);
                   else                          // if only voice 1,
                         // unconditionally set to down if not stems or according to TAB stem direction otherwise
