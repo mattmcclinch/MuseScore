@@ -816,7 +816,8 @@ void Excerpt::cloneStaves(Score* oscore, Score* score, const QList<int>& map, QM
                   //always export these spanners to first voice of the destination staff
 
                   QList<int> track1;
-                  for (int ii = s->track(); ii < s->track() + VOICES; ii++) {
+                  int strack = s->staffIdx() * VOICES;
+                  for (int ii = strack; ii < strack + VOICES; ii++) {
                         track1 += trackList.values(ii);
                         }
 
