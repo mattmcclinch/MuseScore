@@ -513,6 +513,7 @@ class Score : public QObject, public ScoreElement {
       void cmdMoveRest(Rest*, Direction);
       void cmdMoveLyrics(Lyrics*, Direction);
       void cmdIncDecDuration(int nSteps, bool stepDotted = false);
+      void cmdPrevDuration();
       void cmdAddBracket();
       void cmdAddParentheses();
       void resetUserStretch();

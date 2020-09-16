@@ -1645,6 +1645,14 @@ Shortcut Shortcut::_sc[] = {
       {
          MsWidget::SCORE_TAB,
          STATE_NORMAL | STATE_NOTE_ENTRY,
+         "prev-duration",
+         QT_TRANSLATE_NOOP("action","Previous Duration"),
+         QT_TRANSLATE_NOOP("action","Note duration: Previous duration"),
+         QT_TRANSLATE_NOOP("action","Previous duration"),
+         },
+      {
+         MsWidget::SCORE_TAB,
+         STATE_NORMAL | STATE_NOTE_ENTRY,
          "tie",
          QT_TRANSLATE_NOOP("action","Tie"),
          QT_TRANSLATE_NOOP("action","Note duration: Tie"),

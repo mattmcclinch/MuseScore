@@ -41,6 +41,7 @@ enum class NoteEntryMethod : char {
 
 class InputState {
       TDuration   _duration    { TDuration::DurationType::V_INVALID };  // currently duration
+      TDuration   _prevDuration { TDuration::DurationType::V_INVALID };
       int         _drumNote    { -1 };
       int         _track       { 0 };
       int         _prevTrack   { 0 };                       // used for navigation
@@ -63,8 +64,9 @@ class InputState {
 
       Fraction tick() const;
 
-      void setDuration(const TDuration& d) { _duration = d;          }
+      void setDuration(const TDuration& d);
       TDuration duration() const           { return _duration;       }
+      TDuration prevDuration() const       { return _prevDuration;   }
       void setDots(int n);
       Fraction ticks() const               { return _duration.ticks(); }
 

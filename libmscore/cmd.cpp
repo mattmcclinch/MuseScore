@@ -2595,6 +2595,18 @@ void Score::cmdIncDecDuration(int nSteps, bool stepDotted)
       }
 
 //---------------------------------------------------------
+//   cmdPrevDuration
+//---------------------------------------------------------
+
+void Score::cmdPrevDuration()
+      {
+      TDuration d = _is.prevDuration();
+      if (d.isValid() && !d.isZero() && !d.isMeasure()) {
+            _is.setDuration(d);
+            }
+      }
+
+//---------------------------------------------------------
 //   cmdAddBracket
 //---------------------------------------------------------
 
@@ -4066,6 +4078,7 @@ void Score::cmd(const QAction* a, EditData& ed)
             { "toggle-visible",             [](Score* cs, EditData&){ cs->cmdToggleVisible();                                         }},
             { "reset-stretch",              [](Score* cs, EditData&){ cs->resetUserStretch();                                         }},
             { "mirror-note",                [](Score* cs, EditData&){ cs->cmdMirrorNoteHead();                                        }},
+            { "prev-duration",              [](Score* cs, EditData&){ cs->cmdPrevDuration();                                          }},
             { "double-duration",            [](Score* cs, EditData&){ cs->cmdDoubleDuration();                                        }},
             { "half-duration",              [](Score* cs, EditData&){ cs->cmdHalfDuration();                                          }},
             { "inc-duration-dotted",        [](Score* cs, EditData&){ cs->cmdIncDurationDotted();                                     }},

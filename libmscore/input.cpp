@@ -70,13 +70,35 @@ ChordRest* InputState::cr() const
       }
 
 //---------------------------------------------------------
+//   setDuration
+//---------------------------------------------------------
+
+void InputState::setDuration(const TDuration& d)
+      {
+      if (_duration == d) {
+            return;
+            }
+      if (_duration.isValid() && !_duration.isZero() && !_duration.isMeasure()) {
+            _prevDuration = _duration;
+            }
+      _duration = d;
+      }
+
+//---------------------------------------------------------
 //   setDots
 //---------------------------------------------------------
 
 void InputState::setDots(int n)
       {
-      if (n && (!_duration.isValid() || _duration.isZero() || _duration.isMeasure()))
+      if (_duration.dots() == n) {
+            return;
+            }
+      if (_duration.isValid() && !_duration.isZero() && !_duration.isMeasure()) {
+            _prevDuration = _duration;
+            }
+      else if (n != 0) {
             _duration = TDuration::DurationType::V_QUARTER;
+            }
       _duration.setDots(n);
       }
 
