@@ -563,10 +563,12 @@ void Measure::layoutMeasureNumber()
 
       unsigned nn = 1;
       bool nas = score()->styleB(Sid::measureNumberAllStaves);
+      Placement placement = Placement(score()->styleI(Sid::measureNumberVPlacement));
 
       if (!nas) {
-            //find first non invisible staff
-            for (unsigned staffIdx = 0; staffIdx < _mstaves.size(); ++staffIdx) {
+            //find first (or last) non invisible staff
+            for (unsigned i = 0; i < _mstaves.size(); ++i) {
+                  unsigned staffIdx = (placement == Placement::ABOVE ? i : _mstaves.size() - i - 1);
                   if (visible(staffIdx)) {
                         nn = staffIdx;
                         break;
