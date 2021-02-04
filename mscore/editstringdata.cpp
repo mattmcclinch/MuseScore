@@ -163,7 +163,7 @@ void EditStringData::newStringClicked()
             if(i <= 0)
                   i = stringList->rowCount();
             // insert in local string list and in dlg list control
-            instrString strg = {newCode, 0};
+            instrString strg = {newCode, false, 0};
             _stringsLoc.insert(i, strg);
             stringList->insertRow(i);
             QTableWidgetItem *newCheck = new QTableWidgetItem();
