@@ -3514,7 +3514,7 @@ void Score::addRemoveBreaks(int interval, bool lock)
                   if (mm == lastMeasure)
                         break;
                   // skip if it already has a break
-                  if (m->lineBreak() || m->pageBreak())
+                  if (m->lineBreak() || m->pageBreak() || m->sectionBreak())
                         continue;
                   // add break if last measure of system
                   if (mm->system() && mm->system()->lastMeasure() == mm)
@@ -3532,7 +3532,7 @@ void Score::addRemoveBreaks(int interval, bool lock)
                               if (mm == lastMeasure)
                                     break;
                               // found place for break; add if not already one present
-                              if (!(m->lineBreak() || m->pageBreak()))
+                              if (!(m->lineBreak() || m->pageBreak() || m->sectionBreak()))
                                     m->undoSetLineBreak(true);
                               // reset count
                               count = 0;
@@ -3540,6 +3540,10 @@ void Score::addRemoveBreaks(int interval, bool lock)
                         else if (m->lineBreak()) {
                               // remove line break if present in wrong place
                               m->undoSetLineBreak(false);
+                              }
+                        else if (m->pageBreak() || m->sectionBreak()) {
+                              // reset count
+                              count = 0;
                               }
                         }
                   }
