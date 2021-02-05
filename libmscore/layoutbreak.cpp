@@ -45,6 +45,7 @@ LayoutBreak::LayoutBreak(Score* score)
       resetProperty(Pid::START_WITH_MEASURE_ONE);
       resetProperty(Pid::FIRST_SYSTEM_INDENTATION);
       lw = spatium() * 0.3;
+      setVisible(false);
       }
 
 LayoutBreak::LayoutBreak(const LayoutBreak& lb)

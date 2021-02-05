@@ -516,7 +516,7 @@ QRectF Page::tbbox()
       qreal y2 = 0.0;
       const QList<Element*> el = elements();
       for (Element* e : el) {
-            if (e == this || !e->isPrintable())
+            if (e == this || !e->isPrintable() || !e->visible())
                   continue;
             QRectF ebbox = e->pageBoundingRect();
             if (ebbox.left() < x1)
