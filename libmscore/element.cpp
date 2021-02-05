@@ -1437,6 +1437,7 @@ bool Element::isPrintable() const
             case ElementType::STAFF_LIST:
             case ElementType::MEASURE_LIST:
             case ElementType::SELECTION:
+            case ElementType::LAYOUT_BREAK:
                   return false;
             default:
                   return true;
