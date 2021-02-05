@@ -382,6 +382,7 @@ void ScoreView::fotoContextPopup(QContextMenuEvent* ev)
             if (page) {
                   r = page->tbbox().translated(page->canvasPos());
                   _foto->setbbox(r);
+                  _foto->setOffset(QPointF(0.0, 0.0));
                   updateGrips();
                   }
             }
