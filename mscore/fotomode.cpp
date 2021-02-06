@@ -141,6 +141,8 @@ void ScoreView::doDragFoto(QMouseEvent* ev)
 
       update();
       //mscore->showMessage("drag", 2000);
+      if (mscore->inspector())
+            mscore->inspector()->update(_foto->score());
       }
 
 //---------------------------------------------------------

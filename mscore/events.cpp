@@ -683,13 +683,19 @@ void ScoreView::mouseMoveEvent(QMouseEvent* me)
                   break;
 
             case ViewState::DRAG_OBJECT:
-            case ViewState::FOTO_DRAG_OBJECT:
                   doDragElement(me);
                   break;
 
+            case ViewState::FOTO_DRAG_OBJECT:
+                  doDragFotoRect(me);
+                  break;
+
             case ViewState::DRAG_EDIT:
-            case ViewState::FOTO_DRAG_EDIT:
                   doDragEdit(me);
+                  break;
+
+            case ViewState::FOTO_DRAG_EDIT:
+                  doFotoDragEdit(me);
                   break;
 
             case ViewState::LASSO:
