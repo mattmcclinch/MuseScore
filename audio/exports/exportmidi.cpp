@@ -33,11 +33,10 @@ namespace Ms {
 //   writeHeader
 //---------------------------------------------------------
 
-void ExportMidi::writeHeader()
+void ExportMidi::writeHeader(MidiTrack& track)
       {
       if (mf.tracks().isEmpty())
             return;
-      MidiTrack &track  = mf.tracks().front();
 #if 0 // TODO
       MeasureBase* measure  = cs->first();
 
@@ -249,6 +248,8 @@ bool ExportMidi::write(QIODevice* device, bool midiExpandRepeats, bool exportRPN
       mf.setDivision(MScore::division);
       mf.setFormat(1);
       QList<MidiTrack>& tracks = mf.tracks();
+      MidiTrack tempoTrack;
+      tempoTrack.setOutChannel(0);
 
       for (int i = 0; i < cs->nstaves(); ++i)
             tracks.append(MidiTrack());
@@ -257,7 +258,7 @@ bool ExportMidi::write(QIODevice* device, bool midiExpandRepeats, bool exportRPN
       cs->renderMidi(&events, false, midiExpandRepeats, synthState);
 
       pauseMap.calculate(cs);
-      writeHeader();
+      writeHeader(tempoTrack);
 
       int staffIdx = 0;
       for (auto &track: tracks) {
@@ -370,6 +371,7 @@ bool ExportMidi::write(QIODevice* device, bool midiExpandRepeats, bool exportRPN
                   }
             ++staffIdx;
             }
+      mf.tracks().prepend(tempoTrack);
       return !mf.write(device);
       }
 
