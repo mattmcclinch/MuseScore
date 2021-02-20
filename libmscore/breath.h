@@ -61,6 +61,7 @@ class Breath final : public Element {
       QVariant getProperty(Pid propertyId) const override;
       bool setProperty(Pid propertyId, const QVariant&) override;
       QVariant propertyDefault(Pid) const override;
+      Sid getPropertyStyle(Pid pid) const override;
 
       Element* nextSegmentElement() override;
       Element* prevSegmentElement() override;

@@ -34,6 +34,14 @@ const std::vector<BreathType> Breath::breathList {
       };
 
 //---------------------------------------------------------
+//   breathStyle
+//---------------------------------------------------------
+
+static const ElementStyle breathStyle {
+      { Sid::breathCommaPosAbove, Pid::OFFSET },
+      };
+
+//---------------------------------------------------------
 //   Breath
 //---------------------------------------------------------
 
@@ -42,6 +50,7 @@ Breath::Breath(Score* s)
       {
       _symId = SymId::breathMarkComma;
       _pause = 0.0;
+      initElementStyle(&breathStyle);
       }
 
 //---------------------------------------------------------
@@ -209,6 +218,31 @@ QVariant Breath::propertyDefault(Pid id) const
             default:
                   return Element::propertyDefault(id);
             }
+      }
+
+//---------------------------------------------------------
+//   getPropertyStyle
+//---------------------------------------------------------
+
+Sid Breath::getPropertyStyle(Pid pid) const
+      {
+      if (pid == Pid::OFFSET) {
+            switch (_symId) {
+                  case SymId::breathMarkComma:
+                        return placeAbove() ? Sid::breathCommaPosAbove : Sid::breathCommaPosBelow;
+                  case SymId::breathMarkTick:
+                        return placeAbove() ? Sid::breathTickPosAbove : Sid::breathTickPosBelow;
+                  case SymId::breathMarkSalzedo:
+                        return placeAbove() ? Sid::breathSalzedoPosAbove : Sid::breathSalzedoPosBelow;
+                  case SymId::breathMarkUpbow:
+                        return placeAbove() ? Sid::breathUpbowPosAbove : Sid::breathUpbowPosBelow;
+                  case SymId::chantCaesura:
+                        return placeAbove() ? Sid::chantCaesuraPosAbove : Sid::chantCaesuraPosBelow;
+                  default:
+                        return placeAbove() ? Sid::caesuraPosAbove : Sid::caesuraPosBelow;
+                  }
+            }
+      return ScoreElement::getPropertyStyle(pid);
       }
 
 //---------------------------------------------------------

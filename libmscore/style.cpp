@@ -1440,6 +1440,19 @@ static const StyleType styleTypes[] {
       { Sid::figuredBassMinDistance,        "figuredBassMinDistance",        Spatium(0.5)  },
       { Sid::tupletMinDistance,             "tupletMinDistance",             Spatium(0.5)  },
 
+      { Sid::breathCommaPosAbove,           "breathCommaPosAbove",           QPointF(0.0,  0.0) },
+      { Sid::breathCommaPosBelow,           "breathCommaPosBelow",           QPointF(0.0,  0.0) },
+      { Sid::breathTickPosAbove,            "breathTickPosAbove",            QPointF(0.0,  0.0) },
+      { Sid::breathTickPosBelow,            "breathTickPosBelow",            QPointF(0.0,  0.0) },
+      { Sid::breathSalzedoPosAbove,         "breathSalzedoPosAbove",         QPointF(0.0,  0.0) },
+      { Sid::breathSalzedoPosBelow,         "breathSalzedoPosBelow",         QPointF(0.0,  0.0) },
+      { Sid::breathUpbowPosAbove,           "breathUpbowPosAbove",           QPointF(0.0,  0.0) },
+      { Sid::breathUpbowPosBelow,           "breathUpbowPosBelow",           QPointF(0.0,  0.0) },
+      { Sid::caesuraPosAbove,               "caesuraPosAbove",               QPointF(0.0,  0.0) },
+      { Sid::caesuraPosBelow,               "caesuraPosBelow",               QPointF(0.0,  0.0) },
+      { Sid::chantCaesuraPosAbove,          "chantCaesuraPosAbove",          QPointF(0.0,  0.0) },
+      { Sid::chantCaesuraPosBelow,          "chantCaesuraPosBelow",          QPointF(0.0,  0.0) },
+
       { Sid::autoplaceEnabled,              "autoplaceEnabled",              true },
       { Sid::usePre_3_6_defaults,           "usePre_3_6_defaults",           false},
       { Sid::defaultsVersion,               "defaultsVersion",               Ms::MSCVERSION}
