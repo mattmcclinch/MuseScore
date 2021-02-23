@@ -1579,7 +1579,7 @@ static void distributeStaves(Page* page)
       bool transferNormalBracket { false };
       bool transferCurlyBracket  { false };
       for (System* system : page->systems()) {
-            if (system->vbox()) {
+            if (!system->firstMeasure()) {  // vertical frame or only horizontal frames
                   VerticalGapData* vgd = new VerticalGapData(!ngaps++, system, nullptr, nullptr, nullptr, prevYBottom);
                   vgd->addSpaceAroundVBox(true);
                   prevYBottom = system->y();
