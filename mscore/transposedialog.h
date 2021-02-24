@@ -51,6 +51,7 @@ class TransposeDialog : public QDialog, Ui::TransposeDialogBase {
                                                 ? transposeKeys->isChecked()
                                                 : keepDegreeAlterations->isChecked();}
       bool getTransposeChordNames() const { return transposeChordNames->isChecked(); }
+      void setTransposeChordNames(bool val) { transposeChordNames->setChecked(val); }
       Key transposeKey() const            { return Key(keyList->currentIndex() - 7);      }
       int transposeInterval() const       { return chromaticBox->isChecked()
                                                 ? intervalList->currentIndex()
@@ -59,6 +60,7 @@ class TransposeDialog : public QDialog, Ui::TransposeDialogBase {
       TransposeMode mode() const;
       void setKey(Key k)                  { keyList->setCurrentIndex(int(k) + 7); }
       bool useDoubleSharpsFlats() const   { return accidentalOptions->currentIndex() == 1; }
+      void setUseDoubleSharpsFlats(bool val) { accidentalOptions->setCurrentIndex(val ? 1 : 0); }
       };
 }
 

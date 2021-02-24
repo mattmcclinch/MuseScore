@@ -5879,6 +5879,8 @@ void MuseScore::transpose()
             cs->cmdSelectAll();
       bool rangeSelection = cs->selection().isRange();
       TransposeDialog td;
+      static bool useDoubleSharpsFlats = td.useDoubleSharpsFlats();
+      static bool transposeChordNames = td.getTransposeChordNames();
 
       // TRANSPOSE_TO_KEY and "transpose keys" is only possible if selection state is SelState::RANGE
       td.enableTransposeKeys(rangeSelection);
@@ -5910,12 +5912,16 @@ void MuseScore::transpose()
             }
 
       td.setKey(key);
+      td.setUseDoubleSharpsFlats(useDoubleSharpsFlats);
+      td.setTransposeChordNames(transposeChordNames);
       if (!td.exec())
             return;
 
       cs->transpose(td.mode(), td.direction(), td.transposeKey(), td.transposeInterval(),
          td.getTransposeKeys(), td.getTransposeChordNames(), td.useDoubleSharpsFlats());
 
+      useDoubleSharpsFlats = td.useDoubleSharpsFlats();
+      transposeChordNames = td.getTransposeChordNames();
       if (noSelection)
             cs->deselectAll();
       }
