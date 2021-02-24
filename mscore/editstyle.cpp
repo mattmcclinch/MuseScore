@@ -1382,6 +1382,12 @@ void EditStyle::setValues()
 
       //TODO: convert the rest:
 
+      for (int row = 0; row < textStyles->count(); ++row) {
+            Tid tid = Tid(textStyles->item(row)->data(Qt::UserRole).toInt());
+            QString name = cs->getTextStyleUserName(tid);
+            textStyles->item(row)->setText(name);
+            }
+
       QString unit(lstyle.value(Sid::swingUnit).toString());
 
       if (unit == TDuration(TDuration::DurationType::V_EIGHTH).name()) {
