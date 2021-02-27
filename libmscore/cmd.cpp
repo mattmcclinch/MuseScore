@@ -1475,8 +1475,12 @@ static void setTpc(Note* oNote, int tpc, int& newTpc1, int& newTpc2)
 void Score::upDown(bool up, UpDownMode mode)
       {
       QList<Note*> el = selection().uniqueNotes();
+      QSet<Chord*> skip;
+      QSet<Chord*> refret;
 
       for (Note* oNote : qAsConst(el)) {
+            if (skip.contains(oNote->chord()))
+                  continue;
             Fraction tick     = oNote->chord()->tick();
             Staff* staff = oNote->staff();
             Part* part   = staff->part();
@@ -1515,12 +1519,18 @@ void Score::upDown(bool up, UpDownMode mode)
                                     const StaffType* stt = staff->staffType(tick);
                                     string = stt->physStringToVisual(string);
                                     string += (up ? -1 : 1);
-                                    if (string < 0 || string >= stringData->strings())
-                                          return;           // no next string to move to
+                                    if (string < 0 || string >= stringData->strings()) {
+                                          // no next string to move to
+                                          skip.insert(oNote->chord());
+                                          continue;
+                                          }
                                     string = stt->visualStringToPhys(string);
                                     fret = stringData->fret(pitch, string, staff, tick);
-                                    if (fret == -1)          // can't have that note on that string
-                                          return;
+                                    if (fret == -1) {
+                                          // can't have that note on that string
+                                          skip.insert(oNote->chord());
+                                          continue;
+                                          }
                                     // newPitch and newTpc remain unchanged
                                     }
                                     break;
@@ -1632,23 +1642,22 @@ void Score::upDown(bool up, UpDownMode mode)
             // store fret change only if undoChangePitch has not been called,
             // as undoChangePitch() already manages fret changes, if necessary
             else if (staff->staffType(tick)->group() == StaffGroup::TAB) {
-                  bool refret = false;
                   if (oNote->string() != string) {
                         oNote->undoChangeProperty(Pid::STRING, string);
-                        refret = true;
+                        refret.insert(oNote->chord());
                         }
                   if (oNote->fret() != fret) {
                         oNote->undoChangeProperty(Pid::FRET, fret);
-                        refret = true;
-                        }
-                  if (refret) {
-                        const StringData* stringData = part->instrument(tick)->stringData();
-                        stringData->fretChords(oNote->chord());
+                        refret.insert(oNote->chord());
                         }
                   }
 
             // play new note with velocity 80 for 0.3 sec:
             setPlayNote(true);
+            }
+      for (Chord* chord : refret) {
+            const StringData* stringData = chord->staff()->part()->instrument(chord->tick())->stringData();
+            stringData->fretChords(chord);
             }
       setSelectionChanged(true);
       }
