@@ -4251,6 +4251,8 @@ void Score::layoutSystemElements(System* system, LayoutContext& lc)
                               }
                         for (auto n : c->notes())
                               notes.push_back(n);
+                        if (c->staff()->isTabStaff(c->tick()))
+                              notes.sort([](Note* n1, Note* n2) { return n1->string() > n2->string(); });
                         std::list<Fingering*> fingerings;
                         for (Note* note : notes) {
                               for (Element* el : note->el()) {
