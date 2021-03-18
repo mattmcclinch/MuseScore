@@ -49,6 +49,11 @@ void BufferedPaintProvider::beforeEndTargetHook(Painter*)
 {
 }
 
+bool BufferedPaintProvider::endDraw()
+{
+    return true;
+}
+
 bool BufferedPaintProvider::endTarget(bool endDraw)
 {
     UNUSED(endDraw);

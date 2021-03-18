@@ -63,10 +63,15 @@ void QPainterProvider::beforeEndTargetHook(Painter*)
 {
 }
 
+bool QPainterProvider::endDraw()
+{
+    return m_painter->end();
+}
+
 bool QPainterProvider::endTarget(bool endDraw)
 {
     if (endDraw) {
-        return m_painter->end();
+        return this->endDraw();
     }
     return true;
 }

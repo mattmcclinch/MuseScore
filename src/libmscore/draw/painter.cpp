@@ -86,7 +86,7 @@ IPaintProviderPtr Painter::provider() const
 
 bool Painter::endDraw()
 {
-    return endTarget(true);
+    return m_provider->endDraw();
 }
 
 bool Painter::endTarget(bool endDraw)

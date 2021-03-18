@@ -40,6 +40,7 @@ public:
 
     void beginTarget(const std::string& name) override;
     void beforeEndTargetHook(Painter* painter) override;
+    bool endDraw() override;
     bool endTarget(bool endDraw = false) override;
     bool isActive() const override;
 
